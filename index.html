@@ -30,7 +30,7 @@
             width: 100vw;
             height: 100vh;
             background-color: var(--bg-dark);
-            overflow-y: auto; /* Allow scroll on small mobile screens if needed */
+            overflow-y: auto;
             overflow-x: hidden;
             font-family: 'Share Tech Mono', monospace;
             color: var(--neon);
@@ -39,7 +39,7 @@
 
         /* === 2. HOLOGRAPHIC ATMOSPHERE === */
         .cyber-grid {
-            position: fixed; /* Fixed so it doesn't scroll away */
+            position: fixed;
             width: 200vw;
             height: 200vh;
             left: -50%;
@@ -127,24 +127,40 @@
             22% { transform: skewX(0deg); filter: hue-rotate(0deg); } 100% { transform: skewX(0deg); }
         }
 
-        /* NEW HEARTBEAT BAR */
-        .rpm-bar-container { background: rgba(255,255,255,0.05); border: 1px solid rgba(45,212,191,0.2); }
+        /* NEW SEGMENTED HEARTBEAT BAR */
+        .rpm-bar-container { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(45,212,191,0.2); 
+            /* Creates the empty segment lines */
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.8) 4px, rgba(0,0,0,0.8) 5px);
+        }
         
         .rpm-fill {
             height: 100%;
-            background: linear-gradient(90deg, transparent, var(--neon));
+            background: var(--neon);
             width: 0%;
-            /* Modified animation for Heartbeat Rythm */
-            animation: heartbeat-bar 2s infinite ease-in-out;
+            box-shadow: 0 0 15px var(--neon);
+            /* Mask to create segments on the filled part too */
+            mask-image: repeating-linear-gradient(90deg, black, black 4px, transparent 4px, transparent 5px);
+            animation: ecg-beat 2.5s infinite linear;
         }
 
-        @keyframes heartbeat-bar {
+        /* The ECG Rhythm: Flat -> Spike -> Dip -> Spike -> Fade */
+        @keyframes ecg-beat {
             0% { width: 0%; opacity: 0.5; }
-            10% { width: 40%; opacity: 1; }  /* Beat 1 (Systole) */
-            20% { width: 30%; opacity: 0.7; } /* Relax */
-            30% { width: 90%; opacity: 1; box-shadow: 0 0 20px var(--neon); }  /* Beat 2 (Diastole - Stronger) */
-            50% { width: 10%; opacity: 0.5; } /* Relax */
-            100% { width: 0%; opacity: 0.3; } /* Pause */
+            10% { width: 0%; opacity: 0.5; } 
+            
+            /* First Beat (Atrium) */
+            12% { width: 20%; opacity: 1; }
+            15% { width: 10%; opacity: 0.8; }
+            
+            /* Second Beat (Ventricle - The big one) */
+            20% { width: 100%; opacity: 1; filter: brightness(1.5); }
+            25% { width: 90%; opacity: 1; }
+            
+            /* Decay */
+            60% { width: 0%; opacity: 0.2; }
+            100% { width: 0%; opacity: 0; }
         }
 
         /* Buttons */
@@ -166,7 +182,6 @@
             border-left: 2px solid var(--neon);
             backdrop-filter: blur(5px);
             box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-            /* Reset skew so text is readable, apply skew to container if needed */
         }
         .hud-line { height: 1px; width: 20px; background: var(--neon); display: inline-block; vertical-align: middle; margin-right: 5px; opacity: 0.5; }
     </style>
@@ -202,45 +217,48 @@
 
         <div id="spotlight"></div>
 
-        <div class="relative z-30 min-h-screen w-full flex flex-col items-center justify-center p-4 gap-6 md:gap-0">
+        <div class="relative z-30 min-h-screen w-full flex flex-col items-center justify-center p-4">
 
-            <div class="relative w-full max-w-2xl flex justify-start md:absolute md:top-8 md:left-8 md:w-auto md:block z-40 collision-target">
-                <div class="hud-module p-3 w-full md:w-64 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase transform -skew-x-6 md:origin-left">
-                    <div class="flex flex-col gap-1 not-italic skew-x-6">
-                        <div class="border-b border-teal-500/30 pb-1 mb-1 flex justify-between">
-                            <span>SYS.DIAGNOSTICS</span><span class="animate-pulse text-white">● REC</span>
+            <div class="relative w-full max-w-2xl flex justify-between items-start mb-2 z-40 pointer-events-none md:absolute md:inset-0 md:mb-0 md:max-w-none md:block">
+                
+                <div class="pointer-events-auto transform scale-[0.6] origin-top-left md:scale-100 md:absolute md:top-8 md:left-8">
+                    <div class="hud-module p-3 w-64 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase transform -skew-x-6">
+                        <div class="flex flex-col gap-1 not-italic skew-x-6">
+                            <div class="border-b border-teal-500/30 pb-1 mb-1 flex justify-between">
+                                <span>SYS.DIAGNOSTICS</span><span class="animate-pulse text-white">● REC</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>CORE_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span>QUANTUM_FLUX</span><span class="text-teal-300"><span id="t2">15</span> mK</span>
+                            </div>
+                            <div class="mt-2 text-xs text-teal-400 border-t border-teal-500/30 pt-1">
+                                <span class="mr-2">></span><span id="msg">INITIALIZING...</span>
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span>CORE_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>QUANTUM_FLUX</span><span class="text-teal-300"><span id="t2">15</span> mK</span>
-                        </div>
-                        <div class="mt-2 text-xs text-teal-400 border-t border-teal-500/30 pt-1">
-                            <span class="mr-2">></span><span id="msg">INITIALIZING...</span>
+                    </div>
+                </div>
+
+                <div class="pointer-events-auto transform scale-[0.6] origin-top-right md:scale-100 md:absolute md:top-8 md:right-8">
+                    <div class="hud-module p-3 w-56 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 transform -skew-x-6">
+                        <div class="flex flex-col gap-1 skew-x-6">
+                            <div class="border-b border-teal-500/30 pb-1 mb-1 text-teal-600 text-right">LAB_DATA_STREAM_01</div>
+                            <div class="text-xs text-white mb-1 text-right">PROT_ID: <span id="proto" class="text-teal-300 font-mono">76266262</span></div>
+                            <div class="flex items-center justify-end gap-2">
+                                <span id="status" class="text-teal-400">SCANNING...</span>
+                                <div class="w-1.5 h-1.5 bg-teal-400 animate-ping rounded-full"></div>
+                            </div>
+                            <div class="mt-2 pt-1 border-t border-teal-500/30 flex justify-between items-center">
+                                <span class="text-gray-400">QI270 INTEG:</span>
+                                <span id="hlth" class="text-green-400 font-bold font-sporty text-lg">95.0%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="relative w-full max-w-2xl flex justify-end md:absolute md:top-8 md:right-8 md:w-auto md:block z-40 collision-target">
-                <div class="hud-module p-3 w-full md:w-56 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 transform -skew-x-6 md:origin-right">
-                    <div class="flex flex-col gap-1 skew-x-6">
-                        <div class="border-b border-teal-500/30 pb-1 mb-1 text-teal-600 text-right">LAB_DATA_STREAM_01</div>
-                        <div class="text-xs text-white mb-1 text-right">PROT_ID: <span id="proto" class="text-teal-300 font-mono">76266262</span></div>
-                        <div class="flex items-center justify-end gap-2">
-                            <span id="status" class="text-teal-400">SCANNING...</span>
-                            <div class="w-1.5 h-1.5 bg-teal-400 animate-ping rounded-full"></div>
-                        </div>
-                        <div class="mt-2 pt-1 border-t border-teal-500/30 flex justify-between items-center">
-                            <span class="text-gray-400">QI270 INTEG:</span>
-                            <span id="hlth" class="text-green-400 font-bold font-sporty text-lg">95.0%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="aug-card p-8 md:p-16 max-w-2xl w-full group collision-target mt-4 md:mt-0">
+            <div class="aug-card p-8 md:p-16 max-w-2xl w-full group collision-target">
                 <div class="tech-bracket tb-tl"></div>
                 <div class="tech-bracket tb-tr"></div>
                 <div class="tech-bracket tb-bl"></div>
@@ -260,7 +278,7 @@
                         <span class="hud-line"></span> KM/H <span class="hud-line"></span>
                     </div>
 
-                    <div class="h-2 rpm-bar-container rounded-sm mb-10 overflow-hidden collision-target">
+                    <div class="h-4 rpm-bar-container rounded-sm mb-10 overflow-hidden collision-target">
                         <div class="h-full rpm-fill"></div>
                     </div>
 
