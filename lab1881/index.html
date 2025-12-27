@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>270 KM/H - Launch Sequence</title>
+    <title>270 KM/H - Teal & Yellow Launch</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
@@ -12,12 +12,13 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* === 1. CORE SETUP - QUANTUM THEME === */
+        /* === 1. CORE SETUP - TEAL/YELLOW THEME === */
         :root {
-            /* Updated palette based on the reference image (Deep Navy, Blue, Purple) */
-            --quantum-primary: #3b82f6; /* Electric Blue */
-            --quantum-secondary: #8b5cf6; /* Violet */
-            --quantum-accent: #06b6d4; /* Cyan */
+            /* NEW PALETTE: Teal Base with Electric Yellow Accents */
+            --quantum-primary: #14b8a6; /* Teal 500 */
+            --quantum-secondary: #0f766e; /* Teal 700 */
+            --quantum-accent: #facc15; /* Yellow 400 */
+            --quantum-dark: #134e4a; /* Dark Teal */
             --bg-deep: #020617; /* Deep Navy/Black */
         }
 
@@ -25,7 +26,8 @@
             margin: 0;
             padding: 0;
             background-color: var(--bg-deep);
-            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020617 60%);
+            /* Radial Gradient: Deep Teal to Black */
+            background-image: radial-gradient(circle at 50% 0%, #112a28 0%, #020617 70%);
             overflow: hidden; 
         }
 
@@ -36,7 +38,7 @@
             overflow-y: auto;
             overflow-x: hidden;
             font-family: 'Share Tech Mono', monospace;
-            color: var(--quantum-accent);
+            color: var(--quantum-primary);
             cursor: crosshair;
         }
 
@@ -48,11 +50,11 @@
             width: 100%; height: 100%;
             z-index: 1;
             pointer-events: none;
-            opacity: 0.8;
+            opacity: 1; /* Increased opacity for brighter particles */
             mix-blend-mode: screen;
         }
 
-        /* Updated Grid to be subtler and blue */
+        /* Grid - Now Teal */
         .cyber-grid {
             position: fixed;
             width: 200vw;
@@ -60,12 +62,12 @@
             left: -50%;
             top: -50%;
             background-image:
-                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+                linear-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 184, 166, 0.15) 1px, transparent 1px);
             background-size: 80px 80px;
             transform: perspective(500px) rotateX(60deg);
             animation: gridMove 20s linear infinite;
-            opacity: 0.15;
+            opacity: 0.2;
             z-index: 0;
             pointer-events: none;
             mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
@@ -76,7 +78,7 @@
             100% { transform: perspective(500px) rotateX(60deg) translateY(80px); }
         }
 
-        /* === 3. FLUID DATA LINES (Formerly Alien Circuit) === */
+        /* === 3. FLUID DATA LINES === */
         .circuit-container {
             position: fixed;
             inset: 0;
@@ -86,94 +88,101 @@
             height: 100%;
         }
 
-        .alien-path-bg { fill: none; stroke: rgba(139, 92, 246, 0.1); stroke-width: 1; }
+        .alien-path-bg { fill: none; stroke: rgba(20, 184, 166, 0.1); stroke-width: 1; }
+        
+        /* Circuit Lines - Mix of Teal and Yellow */
         .alien-energy-flow {
-            fill: none; stroke: #3b82f6; stroke-width: 2; stroke-linecap: round;
-            stroke-dasharray: 50 800; filter: drop-shadow(0 0 10px #8b5cf6);
+            fill: none; stroke: var(--quantum-primary); stroke-width: 2; stroke-linecap: round;
+            stroke-dasharray: 50 800; filter: drop-shadow(0 0 5px var(--quantum-primary));
             animation: alienPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
-        .flow-delay-1 { animation-delay: 0s; stroke: #06b6d4; }
-        .flow-delay-2 { animation-delay: 0.5s; stroke: #8b5cf6; }
-        .flow-delay-3 { animation-delay: 1.2s; stroke: #3b82f6; }
-        .flow-delay-4 { animation-delay: 0.8s; stroke: #a855f7; }
+        .flow-delay-1 { animation-delay: 0s; stroke: var(--quantum-accent); filter: drop-shadow(0 0 8px var(--quantum-accent)); } /* Yellow Line */
+        .flow-delay-2 { animation-delay: 0.5s; stroke: var(--quantum-primary); }
+        .flow-delay-3 { animation-delay: 1.2s; stroke: #2dd4bf; }
+        .flow-delay-4 { animation-delay: 0.8s; stroke: var(--quantum-accent); opacity: 0.7; }
         @keyframes alienPulse { to { stroke-dashoffset: -850; } }
 
-        /* Spotlight - Soft Blue/Purple Glow */
+        /* Spotlight - Soft Teal Glow */
         #spotlight {
-            background: radial-gradient(circle 800px at var(--x, 50%) var(--y, 50%), rgba(59, 130, 246, 0.15), transparent 100%);
+            background: radial-gradient(circle 800px at var(--x, 50%) var(--y, 50%), rgba(20, 184, 166, 0.1), transparent 100%);
             position: fixed; inset: 0; z-index: 5; pointer-events: none; mix-blend-mode: screen;
         }
 
-        /* === 4. QUANTUM UI ELEMENTS === */
+        /* === 4. UI ELEMENTS === */
         .font-sporty { font-family: 'Orbitron', sans-serif; }
         .font-tech { font-family: 'Rajdhani', sans-serif; }
 
-        /* Glassmorphism Card Style */
+        /* Glassmorphism Card - Full Glass Effect */
         .aug-card {
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(2, 6, 23, 0.4); /* Darker base */
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
+            
+            /* Border: Gradient from White to Teal to Transparent */
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(250, 204, 21, 0.3); /* Yellow tinge on top */
+            border-bottom: 1px solid rgba(20, 184, 166, 0.3); /* Teal tinge on bottom */
+
             box-shadow: 
-                0 0 80px rgba(59, 130, 246, 0.15), 
-                inset 0 0 30px rgba(59, 130, 246, 0.05);
-            /* Rounded corners for the modern quantum look */
+                0 0 80px rgba(20, 184, 166, 0.1), 
+                inset 0 0 30px rgba(20, 184, 166, 0.05);
             border-radius: 30px; 
             position: relative;
             transition: transform 0.1s ease-out;
             overflow: hidden;
         }
         
-        /* Subtle internal shine */
         .aug-card::after {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
             pointer-events: none;
         }
 
-        /* Tech Corners - Softened to glowing dots/accents */
+        /* Corners - Now Electric Yellow */
         .tech-bracket {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%;
-            background: var(--quantum-primary);
-            box-shadow: 0 0 10px var(--quantum-primary);
-            transition: all 0.3s ease; opacity: 0.6;
+            position: absolute; width: 8px; height: 8px; border-radius: 0;
+            background: var(--quantum-accent); /* Yellow */
+            box-shadow: 0 0 10px var(--quantum-accent);
+            transition: all 0.3s ease; opacity: 0.8;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
         }
-        .tb-tl { top: 15px; left: 15px; }
-        .tb-tr { top: 15px; right: 15px; }
-        .tb-bl { bottom: 15px; left: 15px; }
-        .tb-br { bottom: 15px; right: 15px; }
+        .tb-tl { top: 0px; left: 0px; width: 20px; height: 20px; border-top: 2px solid var(--quantum-accent); border-left: 2px solid var(--quantum-accent); background: transparent; }
+        .tb-tr { top: 0px; right: 0px; width: 20px; height: 20px; border-top: 2px solid var(--quantum-accent); border-right: 2px solid var(--quantum-accent); background: transparent; }
+        .tb-bl { bottom: 0px; left: 0px; width: 20px; height: 20px; border-bottom: 2px solid var(--quantum-accent); border-left: 2px solid var(--quantum-accent); background: transparent; }
+        .tb-br { bottom: 0px; right: 0px; width: 20px; height: 20px; border-bottom: 2px solid var(--quantum-accent); border-right: 2px solid var(--quantum-accent); background: transparent; }
         
-        .aug-card:hover .tech-bracket { box-shadow: 0 0 20px var(--quantum-secondary); background: var(--quantum-secondary); }
+        .aug-card:hover .tech-bracket { 
+            box-shadow: 0 0 20px var(--quantum-accent); 
+            border-color: #fff;
+        }
 
-        /* Gradient Text */
+        /* Gradient Text - Teal to Yellow */
         .glitch {
             position: relative; 
-            background: linear-gradient(135deg, #fff 0%, #3b82f6 50%, #a855f7 100%);
+            background: linear-gradient(135deg, #fff 0%, #2dd4bf 40%, #facc15 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Subtler glow for Quantum theme */
-            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+            filter: drop-shadow(0 0 15px rgba(20, 184, 166, 0.5));
             animation: pulse-glow 3s infinite alternate;
         }
         
         @keyframes pulse-glow {
-            0% { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)); }
-            100% { filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.6)); }
+            0% { filter: drop-shadow(0 0 10px rgba(20, 184, 166, 0.3)); }
+            100% { filter: drop-shadow(0 0 25px rgba(250, 204, 21, 0.5)); }
         }
 
-        /* CONTINUOUS LOOP BAR */
+        /* LOOP BAR - Teal with Yellow Tip */
         .rpm-bar-container { 
             background: rgba(0,0,0,0.3); 
             border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 99px; /* Pill shape */
+            border-radius: 99px;
         }
         
         .rpm-fill {
             height: 100%;
-            background: linear-gradient(90deg, transparent, #3b82f6, #a855f7);
+            background: linear-gradient(90deg, transparent, #14b8a6, #facc15);
             width: 0%;
-            box-shadow: 0 0 20px #3b82f6;
+            box-shadow: 0 0 20px #14b8a6;
             animation: continuous-loop 2s infinite linear;
             border-radius: 99px;
         }
@@ -185,35 +194,37 @@
             100% { width: 100%; opacity: 0; }
         }
 
-        /* Buttons */
+        /* Buttons - Teal glass with Yellow Hover */
         .cyber-btn {
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(59, 130, 246, 0.4);
+            background: rgba(20, 184, 166, 0.05); 
+            border: 1px solid rgba(20, 184, 166, 0.4);
             border-radius: 99px;
             position: relative; overflow: hidden; transition: all 0.3s;
+            color: #fff;
         }
         .cyber-btn::before {
             content:''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(250, 204, 21, 0.4), transparent);
             transition: 0.5s;
         }
         .cyber-btn:hover::before { left: 100%; }
         .cyber-btn:hover { 
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)); 
-            border-color: #a855f7;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3); 
+            background: linear-gradient(90deg, rgba(20, 184, 166, 0.2), rgba(250, 204, 21, 0.1)); 
+            border-color: var(--quantum-accent);
+            color: var(--quantum-accent);
+            box-shadow: 0 0 30px rgba(250, 204, 21, 0.2); 
             letter-spacing: 0.2em; 
         }
 
-        /* HUD Modules - Glassy floaters */
+        /* HUD Modules */
         .hud-module {
-            background: rgba(15, 23, 42, 0.6);
-            border-left: 2px solid #3b82f6;
+            background: rgba(2, 6, 23, 0.7);
+            border-left: 2px solid var(--quantum-accent); /* Yellow accent */
             backdrop-filter: blur(10px);
-            border-radius: 8px;
+            border-radius: 4px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .hud-line { height: 1px; width: 20px; background: #3b82f6; display: inline-block; vertical-align: middle; margin-right: 5px; opacity: 0.5; }
+        .hud-line { height: 1px; width: 20px; background: var(--quantum-primary); display: inline-block; vertical-align: middle; margin-right: 5px; opacity: 0.5; }
     </style>
 </head>
 
@@ -222,7 +233,6 @@
     <div id="alien-f1-root">
 
         <div class="cyber-grid"></div>
-
         <canvas id="quantum-canvas"></canvas>
 
         <div class="circuit-container">
@@ -252,36 +262,36 @@
         <div class="relative z-30 min-h-screen w-full flex flex-col items-center justify-center p-4">
 
             <div class="absolute top-4 left-4 z-40 origin-top-left transform scale-50 md:scale-100 md:top-8 md:left-8">
-                <div class="hud-module p-3 w-64 text-[10px] text-cyan-400 font-tech tracking-[0.15em] uppercase transform -skew-x-6 border-l-2 border-cyan-500">
+                <div class="hud-module p-3 w-64 text-[10px] text-teal-400 font-tech tracking-[0.15em] uppercase transform -skew-x-6 border-l-2 border-yellow-400">
                     <div class="flex flex-col gap-1 not-italic skew-x-6">
-                        <div class="border-b border-cyan-500/30 pb-1 mb-1 flex justify-between">
-                            <span>VEHICLE.TELEMETRY</span><span class="animate-pulse text-white">● REC</span>
+                        <div class="border-b border-teal-500/30 pb-1 mb-1 flex justify-between">
+                            <span>VEHICLE.TELEMETRY</span><span class="animate-pulse text-yellow-400">● REC</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span>MOTOR_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span>ENERGY_FLOW</span><span class="text-blue-300"><span id="t2">15</span> kW</span>
+                            <span>ENERGY_FLOW</span><span class="text-yellow-200"><span id="t2">15</span> kW</span>
                         </div>
-                        <div class="mt-2 text-xs text-blue-400 border-t border-cyan-500/30 pt-1">
-                            <span class="mr-2">></span><span id="msg">SYSTEM CHECK...</span>
+                        <div class="mt-2 text-xs text-teal-500 border-t border-teal-500/30 pt-1">
+                            <span class="mr-2 text-yellow-400">></span><span id="msg">SYSTEM CHECK...</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="absolute top-4 right-4 z-40 origin-top-right transform scale-50 md:scale-100 md:top-8 md:right-8">
-                <div class="hud-module p-3 w-56 text-[10px] text-indigo-400 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 border-indigo-500 transform -skew-x-6">
+                <div class="hud-module p-3 w-56 text-[10px] text-teal-400 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 border-teal-500 transform -skew-x-6">
                     <div class="flex flex-col gap-1 skew-x-6">
-                        <div class="border-b border-indigo-500/30 pb-1 mb-1 text-indigo-300 text-right">PERFORMANCE_MONITOR</div>
-                        <div class="text-xs text-white mb-1 text-right">SESSION_ID: <span id="proto" class="text-purple-300 font-mono">76266262</span></div>
+                        <div class="border-b border-teal-500/30 pb-1 mb-1 text-teal-300 text-right">PERFORMANCE_MONITOR</div>
+                        <div class="text-xs text-white mb-1 text-right">SESSION_ID: <span id="proto" class="text-yellow-400 font-mono">76266262</span></div>
                         <div class="flex items-center justify-end gap-2">
-                            <span id="status" class="text-blue-400">CONNECTING...</span>
-                            <div class="w-1.5 h-1.5 bg-blue-400 animate-ping rounded-full"></div>
+                            <span id="status" class="text-teal-400">CONNECTING...</span>
+                            <div class="w-1.5 h-1.5 bg-yellow-400 animate-ping rounded-full"></div>
                         </div>
-                        <div class="mt-2 pt-1 border-t border-indigo-500/30 flex justify-between items-center">
+                        <div class="mt-2 pt-1 border-t border-teal-500/30 flex justify-between items-center">
                             <span class="text-gray-400">BATTERY INTEGRITY:</span>
-                            <span id="hlth" class="text-cyan-400 font-bold font-sporty text-lg">95.0%</span>
+                            <span id="hlth" class="text-teal-300 font-bold font-sporty text-lg">95.0%</span>
                         </div>
                     </div>
                 </div>
@@ -298,8 +308,8 @@
                     <div class="inline-block relative mb-4 collision-target">
                         <h1 class="font-sporty text-7xl md:text-9xl leading-none italic pr-8 glitch">270</h1>
                         <div class="absolute -right-10 top-0 flex flex-col items-center gap-1">
-                            <span class="text-[10px] bg-blue-600 rounded text-white px-1 font-mono font-bold">MK.IV</span>
-                            <span class="w-px h-12 bg-blue-500/50"></span>
+                            <span class="text-[10px] bg-yellow-500 rounded text-black px-1 font-mono font-bold shadow-[0_0_10px_rgba(250,204,21,0.6)]">MK.IV</span>
+                            <span class="w-px h-12 bg-teal-500/50"></span>
                         </div>
                     </div>
 
@@ -311,17 +321,17 @@
                         <div class="h-full rpm-fill"></div>
                     </div>
 
-                    <div class="border-y border-white/10 py-6 mb-10 bg-indigo-950/30 backdrop-blur-md rounded-lg">
+                    <div class="border-y border-white/10 py-6 mb-10 bg-teal-950/30 backdrop-blur-md rounded-lg">
                         <div class="flex items-center justify-center gap-3 mb-2">
-                            <i data-lucide="zap" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
-                            <p class="text-blue-200 text-xs tracking-[0.3em] font-tech uppercase">Launch Sequence: <span class="text-white font-bold text-sm">2026</span></p>
-                            <i data-lucide="zap" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
+                            <i data-lucide="zap" class="w-4 h-4 text-yellow-400 animate-pulse"></i>
+                            <p class="text-teal-200 text-xs tracking-[0.3em] font-tech uppercase">Launch Sequence: <span class="text-white font-bold text-sm">2026</span></p>
+                            <i data-lucide="zap" class="w-4 h-4 text-yellow-400 animate-pulse"></i>
                         </div>
-                        <p class="text-indigo-300/70 text-[10px] font-tech tracking-widest uppercase">Aerodynamics Beyond Physics</p>
+                        <p class="text-teal-300/70 text-[10px] font-tech tracking-widest uppercase">Aerodynamics Beyond Physics</p>
                     </div>
 
                     <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="collision-target inline-flex items-center px-10 py-4 cyber-btn text-white font-sporty text-xs tracking-widest uppercase group">
-                        <i data-lucide="linkedin" class="w-4 h-4 mr-3 group-hover:text-cyan-300"></i>
+                        <i data-lucide="linkedin" class="w-4 h-4 mr-3 group-hover:text-yellow-300"></i>
                         <span>Confirm Attendance</span>
                     </a>
 
@@ -330,13 +340,13 @@
 
             <div class="flex flex-col items-center gap-1 opacity-80 mt-8 md:absolute md:bottom-8">
                 <div class="flex items-end gap-1 mb-1">
-                    <div class="w-1 h-2 bg-blue-500 animate-pulse rounded-full"></div>
-                    <div class="w-1 h-3 bg-indigo-500 animate-pulse rounded-full" style="animation-delay: 0.1s"></div>
-                    <div class="w-1 h-4 bg-purple-500 animate-pulse rounded-full" style="animation-delay: 0.2s"></div>
-                    <div class="w-1 h-3 bg-indigo-500 animate-pulse rounded-full" style="animation-delay: 0.3s"></div>
-                    <div class="w-1 h-2 bg-blue-500 animate-pulse rounded-full" style="animation-delay: 0.4s"></div>
+                    <div class="w-1 h-2 bg-teal-500 animate-pulse rounded-full"></div>
+                    <div class="w-1 h-3 bg-yellow-500 animate-pulse rounded-full" style="animation-delay: 0.1s"></div>
+                    <div class="w-1 h-4 bg-teal-300 animate-pulse rounded-full" style="animation-delay: 0.2s"></div>
+                    <div class="w-1 h-3 bg-yellow-500 animate-pulse rounded-full" style="animation-delay: 0.3s"></div>
+                    <div class="w-1 h-2 bg-teal-500 animate-pulse rounded-full" style="animation-delay: 0.4s"></div>
                 </div>
-                <div class="text-[9px] text-cyan-400 tracking-[0.5em] uppercase font-bold text-shadow-glow">Compiling... 49%</div>
+                <div class="text-[9px] text-teal-400 tracking-[0.5em] uppercase font-bold text-shadow-glow">Compiling... 49%</div>
             </div>
 
         </div>
@@ -344,7 +354,7 @@
     </div>
 
     <script>
-        // --- 1. QUANTUM PARTICLES (UPDATED COLORS) ---
+        // --- 1. PARTICLES (Updated to Teal & Gold) ---
         const canvas = document.getElementById('quantum-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -364,8 +374,8 @@
                 this.speedX = (Math.random() - 0.5) * 1.5; 
                 this.speedY = (Math.random() - 0.5) * 1.5; 
                 this.life = Math.random() * 100; 
-                // Randomly assign Blue or Purple tint
-                this.hue = Math.random() > 0.5 ? 210 : 270; // Blue or Purple
+                // Randomly assign Teal (170) or Gold (45)
+                this.hue = Math.random() > 0.6 ? 170 : 45; 
             }
 
             update() {
@@ -380,9 +390,8 @@
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 const alpha = (Math.sin(this.life * 0.05) + 1) / 2 * 0.5 + 0.2; 
-                // Updated Color Logic to HSLA
-                ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${alpha})`;
-                ctx.shadowBlur = 15;
+                ctx.fillStyle = `hsla(${this.hue}, 100%, 60%, ${alpha})`;
+                ctx.shadowBlur = 10;
                 ctx.shadowColor = `hsla(${this.hue}, 100%, 50%, 0.8)`;
                 ctx.fill();
             }
@@ -409,21 +418,18 @@
         animateParticles();
 
 
-        // --- 2. HUD DATA UPDATES (UNCHANGED LOGIC) ---
+        // --- 2. HUD DATA UPDATES (UNCHANGED) ---
         
-        // Random Motor Temp
         setInterval(() => {
             const el = document.getElementById('t1');
             if(el) el.innerText = Math.floor(Math.random()*(90-50)+50);
         }, 1200);
 
-        // Random Energy Flow (kW)
         setInterval(() => {
             const el = document.getElementById('t2');
             if(el) el.innerText = Math.floor(Math.random()*(250-10)+10);
         }, 150);
 
-        // System Messages
         const msgs = ["SYSTEM_CHECK: OK", "TRACTION_CTRL: ON", "TORQUE_VECTOR: ACTIVE", "AERO_DYNAMICS: OPTIMAL", "TIRE_PRESSURE: STABLE"];
         let mi = 0;
         setInterval(() => {
@@ -434,13 +440,11 @@
             }
         }, 2500);
 
-        // Random Session ID
         setInterval(() => {
             const el = document.getElementById('proto');
             if(el) el.innerText = Math.floor(Math.random()*90000000)+10000000;
         }, 50);
 
-        // Status
         const st = ["CONNECTING...", "SYNCING...", "ENCRYPTING...", "PACKET_RX"];
         let si = 0;
         setInterval(() => {
@@ -451,7 +455,6 @@
             }
         }, 800);
 
-        // Health Percentage
         setInterval(() => {
             const el = document.getElementById('hlth');
             if(el) el.innerText = (Math.random()*(99-97)+97).toFixed(1)+"%";
@@ -467,7 +470,6 @@
                 root.style.setProperty('--y', e.clientY + 'px');
                 const card = document.querySelector('.aug-card');
                 if(card) {
-                    // Increased smoothing slightly for glass effect feel
                     card.style.transform = `perspective(1000px) rotateY(${x * 0.03}deg) rotateX(${y * -0.03}deg)`;
                 }
             }
