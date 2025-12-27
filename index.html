@@ -3,392 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>270 KM/h | QUANTUM OVERDRIVE</title>
+    <title>270 KM/h | HUD MODE</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Chakra+Petch:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
-        /* === 1. CONFIGURATION & VARIABLES === */
-        :root {
-            --neon-cyan: #00f3ff;
-            --neon-yellow: #ffee00;
-            --deep-space: #050508;
-            --hud-grid: rgba(0, 243, 255, 0.05);
+        /* === 1. CORE VARIABLES === */
+        :root { 
+            --neon: #2dd4bf; 
+            --bg-dark: #000202; 
         }
 
-        body {
-            background-color: var(--deep-space);
-            color: #e0e0e0;
-            font-family: 'Rajdhani', sans-serif;
-            overflow-x: hidden;
-            cursor: crosshair; /* Tactical feel */
+        body { 
+            margin: 0; padding: 0; overflow: hidden; background: var(--bg-dark); 
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--neon);
+            cursor: none; /* Custom cursor active */
         }
 
-        /* === 2. BACKGROUND & TEXTURE === */
-        #quantum-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.6; pointer-events: none;
-        }
-
-        /* CRT Scanline Overlay */
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 4px;
-            z-index: 1; pointer-events: none; opacity: 0.3;
-        }
-
-        /* === 3. UI COMPONENTS === */
-        .font-header { font-family: 'Orbitron', sans-serif; }
-        .font-tech { font-family: 'Share Tech Mono', monospace; }
-
-        /* Advanced Glassmorphism */
-        .hud-card {
-            background: rgba(10, 20, 30, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 243, 255, 0.1);
-            border-left: 3px solid rgba(0, 243, 255, 0.3);
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+        /* === 2. ANIMATIONS (CSS) === */
         
-        .hud-card::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transform: skewX(-20deg);
-            transition: 0.5s;
+        /* A. Warp Speed Grid */
+        .horizon-grid {
+            position: absolute; width: 300%; height: 300%; left: -100%; top: -100%;
+            background-image: 
+                linear-gradient(rgba(45, 212, 191, 0.1) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(45, 212, 191, 0.1) 1px, transparent 1px);
+            background-size: 80px 80px; 
+            transform-style: preserve-3d;
+            animation: warp-speed 4s linear infinite; /* Sped up for impact */
+            mask-image: radial-gradient(circle at center, black 0%, transparent 70%);
+            opacity: 0.3; pointer-events: none; z-index: 0;
+        }
+        @keyframes warp-speed { 
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-100px); } 
+            100% { transform: perspective(500px) rotateX(60deg) translateY(80px) translateZ(-100px); } 
         }
 
-        .hud-card:hover::before { left: 150%; transition: 0.5s; }
-        .hud-card:hover { 
-            border-color: var(--neon-cyan); 
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.15);
-            transform: translateY(-2px);
+        /* B. Quantum Rings */
+        .quantum-ring {
+            position: absolute; left: 50%; top: 50%; width: 80vh; height: 80vh;
+            border: 1px dashed rgba(45, 212, 191, 0.2); border-radius: 50%;
+            transform: translate(-50%, -50%); animation: spin-cw 30s linear infinite; pointer-events: none; z-index: 1;
         }
+        .quantum-ring-2 {
+            position: absolute; left: 50%; top: 50%; width: 60vh; height: 60vh;
+            border: 1px dotted rgba(45, 212, 191, 0.1); border-left: 20px solid rgba(45, 212, 191, 0.1); border-right: 20px solid rgba(45, 212, 191, 0.1);
+            border-radius: 50%; transform: translate(-50%, -50%); animation: spin-ccw 20s linear infinite; pointer-events: none; z-index: 1;
+        }
+        @keyframes spin-cw { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes spin-ccw { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(-360deg); } }
 
-        /* Glitch Title Effect */
-        .glitch-wrapper { position: relative; display: inline-block; }
-        .glitch-wrapper:hover {
-            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-            color: var(--neon-cyan);
-            text-shadow: 2px 0 var(--neon-yellow), -2px 0 #ff00c1;
+        /* C. Photon Circuits */
+        .circuit-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0.4; }
+        .photon-path {
+            fill: none; stroke: var(--neon); stroke-width: 1px; stroke-dasharray: 20 150; stroke-linecap: square;
+            filter: drop-shadow(0 0 5px var(--neon)); animation: photon-interference 3s linear infinite;
         }
-        @keyframes glitch-anim {
-            0% { transform: translate(0) }
-            20% { transform: translate(-2px, 2px) }
-            40% { transform: translate(-2px, -2px) }
-            60% { transform: translate(2px, 2px) }
-            80% { transform: translate(2px, -2px) }
-            100% { transform: translate(0) }
-        }
+        @keyframes photon-interference { 0% { stroke-dashoffset: 300; } 100% { stroke-dashoffset: -300; } }
 
-        /* === 4. REACTOR CORE ANIMATION === */
-        .reactor-container {
-            position: relative; width: 400px; height: 400px;
-            display: flex; justify-content: center; align-items: center;
-        }
-        
-        .turbine {
-            position: absolute; border-radius: 50%;
-            border: 1px dashed rgba(0, 243, 255, 0.3);
-        }
+        /* === 3. UI TYPOGRAPHY === */
+        .font-header { font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 0.1em; }
+        .hud-text { text-shadow: 0 0 10px rgba(45, 212, 191, 0.5); }
 
-        .t-1 { width: 100%; height: 100%; border-top: 4px solid var(--neon-cyan); animation: rotate 10s linear infinite; }
-        .t-2 { width: 80%; height: 80%; border-left: 4px solid var(--neon-yellow); animation: rotate 6s linear infinite reverse; }
-        .t-3 { width: 60%; height: 60%; border: 2px dotted rgba(255,255,255,0.5); animation: rotate 20s linear infinite; }
-        
-        .core {
-            width: 40%; height: 40%;
-            background: radial-gradient(circle, #fff, var(--neon-cyan), transparent);
-            filter: blur(20px);
-            opacity: 0.7;
-            animation: breathe 3s ease-in-out infinite;
-        }
-
-        @keyframes rotate { 100% { transform: rotate(360deg); } }
-        @keyframes breathe { 0%, 100% { transform: scale(0.9); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.9; } }
-
-        /* === 5. UTILS === */
-        .btn-cyber {
-            background: transparent;
-            color: var(--neon-yellow);
-            border: 1px solid var(--neon-yellow);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 700;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-        .btn-cyber:hover {
-            background: var(--neon-yellow);
-            color: black;
-            box-shadow: 0 0 20px var(--neon-yellow);
-        }
+        /* Custom Cursor */
+        #cursor-dot { width: 4px; height: 4px; background: white; position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; box-shadow: 0 0 10px var(--neon); }
+        #cursor-ring { width: 40px; height: 40px; border: 1px solid var(--neon); position: fixed; border-radius: 50%; pointer-events: none; z-index: 9998; opacity: 0.5; transition: transform 0.1s ease-out; }
 
     </style>
 </head>
-<body class="flex flex-col min-h-screen relative">
+<body class="w-screen h-screen relative flex items-center justify-center">
 
-    <div class="scanlines"></div>
-    <canvas id="quantum-canvas"></canvas>
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
 
-    <nav class="w-full p-6 md:px-12 flex justify-between items-center z-50 relative border-b border-white/5">
-        <div class="flex items-center gap-2 group cursor-pointer">
-            <i data-lucide="cpu" class="text-[var(--neon-cyan)] w-8 h-8 group-hover:rotate-180 transition-transform duration-700"></i>
-            <div class="font-header text-2xl font-bold italic tracking-tighter leading-none">
-                270 <span class="text-[var(--neon-cyan)] not-italic">KM/H</span>
+    <div class="horizon-grid"></div>
+    <div class="quantum-ring"></div>
+    <div class="quantum-ring-2"></div>
+
+    <div class="circuit-layer">
+        <svg width="100%" height="100%">
+            <path d="M0,100 Q300,100 500,500" class="photon-path" />
+            <path d="M10000,100 Q900,100 500,500" class="photon-path" style="animation-delay: 1s"/>
+             <path d="M0,900 Q300,900 500,500" class="photon-path" style="animation-duration: 4s"/>
+            <path d="M10000,900 Q900,900 500,500" class="photon-path" style="animation-duration: 2s"/>
+        </svg>
+    </div>
+
+    <div class="relative z-10 text-center mix-blend-screen">
+        <h1 class="text-[120px] md:text-[180px] leading-none font-header italic text-transparent bg-clip-text bg-gradient-to-b from-white to-teal-900 decrypt-target" data-value="270">
+            270
+        </h1>
+        <div class="text-2xl md:text-4xl font-bold tracking-[1em] text-teal-400 pl-4 animate-pulse">
+            KM/H
+        </div>
+    </div>
+
+    <div class="absolute top-8 left-8 z-20">
+        <div class="flex flex-col gap-2">
+            <div class="text-xs text-teal-600 tracking-widest font-header">CORE_TEMPERATURE</div>
+            <div class="text-4xl font-bold hud-text"><span id="t1">00</span>°C</div>
+            <div class="w-32 h-1 bg-gray-800 mt-1"><div class="h-full bg-teal-400 w-[70%] animate-pulse"></div></div>
+        </div>
+    </div>
+
+    <div class="absolute top-8 right-8 z-20 text-right">
+        <div class="flex flex-col gap-2 items-end">
+            <div class="text-xs text-teal-600 tracking-widest font-header">SYSTEM_ID</div>
+            <div class="text-xl font-bold hud-text text-white">PROTO_<span id="proto">8822</span></div>
+            <div class="flex items-center gap-2 text-xs text-teal-400">
+                <i data-lucide="shield-check" class="w-3 h-3"></i> <span id="status">SECURE</span>
             </div>
         </div>
-        
-        <div class="hidden md:flex gap-10 text-xs font-bold font-tech text-gray-500 tracking-[0.2em] uppercase">
-            <a href="#" class="hover:text-white hover:tracking-[0.25em] transition-all">Telemetry</a>
-            <a href="#" class="hover:text-white hover:tracking-[0.25em] transition-all">Engine_Map</a>
-            <a href="#" class="hover:text-[var(--neon-yellow)] hover:tracking-[0.25em] transition-all flex items-center gap-2">
-                <span class="w-2 h-2 bg-[var(--neon-yellow)] rounded-full animate-pulse"></span> Live
-            </a>
-        </div>
+    </div>
 
-        <div class="md:hidden text-[var(--neon-cyan)]">
-            <i data-lucide="menu" class="w-8 h-8"></i>
-        </div>
-    </nav>
-
-    <main class="flex-grow flex flex-col md:flex-row items-center px-6 md:px-16 relative z-10 max-w-screen-xl mx-auto w-full">
-        
-        <div class="w-full md:w-1/2 flex flex-col gap-8 z-20 pt-10 md:pt-0">
-            
-            <div class="flex items-center gap-4">
-                <div class="px-2 py-1 border border-[var(--neon-cyan)] text-[var(--neon-cyan)] text-[10px] font-tech">SYS_READY</div>
-                <div class="h-[1px] w-20 bg-gray-700"></div>
-                <div class="text-[10px] text-gray-500 font-tech">V.9.4.1</div>
-            </div>
-
-            <h1 class="text-5xl md:text-7xl lg:text-8xl font-header font-bold leading-[0.9] uppercase text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-200 to-gray-600">
-                Limitless <br> 
-                <span class="glitch-wrapper text-[var(--neon-cyan)]">Velocity</span>
-            </h1>
-
-            <p class="text-gray-400 text-sm md:text-base max-w-md font-tech leading-relaxed border-l-2 border-gray-700 pl-4">
-                :: INITIALIZING QUANTUM PROTOCOLS <br>
-                Hyper-threading aerodynamics enabled. Experience the raw calculation of speed at the edge of physics.
-            </p>
-
-            <div class="flex gap-4 pt-4">
-                <button class="btn-cyber px-8 py-4 flex items-center gap-3">
-                    Initialize
-                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                </button>
-                <button class="px-8 py-4 text-xs font-bold tracking-widest text-gray-400 hover:text-white transition uppercase font-tech">
-                    [ Read Documentation ]
-                </button>
+    <div class="absolute bottom-8 left-8 z-20">
+        <div class="flex items-end gap-4">
+            <div class="text-6xl font-header opacity-50 text-gray-600">04</div>
+            <div class="pb-2">
+                <div class="text-xs text-teal-500 mb-1">QUANTUM COHERENCE</div>
+                <div class="text-lg text-white" id="msg">INITIALIZING...</div>
             </div>
         </div>
+    </div>
 
-        <div class="w-full md:w-1/2 flex justify-center items-center h-[50vh] md:h-auto relative">
-            <div class="absolute w-full h-full border border-dashed border-white/5 rounded-full animate-[spin_60s_linear_infinite] opacity-20"></div>
-
-            <div class="reactor-container">
-                <div class="core"></div>
-                <div class="turbine t-1"></div>
-                <div class="turbine t-2"></div>
-                <div class="turbine t-3"></div>
-
-                <div class="absolute hud-card p-4 -top-10 -right-4 md:right-10 w-40 animate-bounce duration-[4000ms]">
-                    <div class="flex justify-between items-center mb-2">
-                        <i data-lucide="shield-alert" class="w-4 h-4 text-[var(--neon-yellow)]"></i>
-                        <span class="text-[10px] text-gray-400 font-tech">FIREWALL</span>
-                    </div>
-                    <div class="text-xl font-header">ACTIVE</div>
-                </div>
-
-                <div class="absolute hud-card p-4 -bottom-6 left-0 w-48 animate-bounce duration-[5000ms]">
-                    <div class="flex justify-between items-center mb-2">
-                        <i data-lucide="zap" class="w-4 h-4 text-[var(--neon-cyan)]"></i>
-                        <span class="text-[10px] text-gray-400 font-tech">OUTPUT</span>
-                    </div>
-                    <div class="text-2xl font-header flex items-baseline gap-1">
-                        98.4 <span class="text-xs font-tech text-gray-500">TW</span>
-                    </div>
-                    <div class="w-full h-1 bg-gray-800 mt-2 rounded overflow-hidden">
-                        <div class="h-full bg-[var(--neon-cyan)] w-[80%] animate-pulse"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <footer class="w-full p-4 md:px-12 z-20 bg-black/40 backdrop-blur-md border-t border-white/10 mt-auto">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
-            
-            <div class="flex flex-col gap-1 border-r border-white/10 px-4">
-                <span class="text-[10px] text-gray-500 font-tech tracking-widest">CORE_TEMP</span>
-                <div class="text-2xl font-bold font-tech text-white flex items-center gap-2">
-                    <span id="temp-val">42</span>°C
-                    <i data-lucide="thermometer" class="w-4 h-4 text-green-400"></i>
-                </div>
-            </div>
-
-            <div class="flex flex-col gap-1 border-r border-white/10 px-4">
-                <span class="text-[10px] text-gray-500 font-tech tracking-widest">LATENCY</span>
-                <div class="text-2xl font-bold font-tech text-white flex items-center gap-2">
-                    <span id="ping-val">12</span>ms
-                    <i data-lucide="activity" class="w-4 h-4 text-[var(--neon-cyan)]"></i>
-                </div>
-            </div>
-
-            <div class="flex flex-col gap-1 border-r border-white/10 px-4">
-                <span class="text-[10px] text-gray-500 font-tech tracking-widest">ENCRYPTION</span>
-                <div class="text-lg font-bold font-tech text-[var(--neon-yellow)]">
-                    AES-256-GCM
-                </div>
-            </div>
-
-            <div class="flex flex-col gap-1 px-4">
-                 <span class="text-[10px] text-gray-500 font-tech tracking-widest">STATUS</span>
-                 <div class="text-xs font-tech text-green-400 animate-pulse">
-                     > SYSTEM OPTIMAL
-                 </div>
-            </div>
-
-        </div>
-    </footer>
+    <div class="absolute bottom-8 right-8 z-20 text-right">
+        <div class="text-xs text-teal-600 tracking-widest font-header mb-1">HEALTH</div>
+        <div class="text-5xl font-bold text-white hud-text"><span id="hlth">100</span>%</div>
+        <div class="text-[10px] text-teal-400 mt-1">OPTIMIZED FOR VELOCITY</div>
+    </div>
 
     <script>
-        // 1. Icons
-        lucide.createIcons();
-
-        // 2. Interactive Quantum Field (Canvas)
-        const canvas = document.getElementById('quantum-canvas');
-        const ctx = canvas.getContext('2d');
+        // === 1. DATA ANIMATION ENGINE ===
         
-        let width, height;
-        let particles = [];
-        
-        // Mouse tracking
-        let mouse = { x: null, y: null, radius: 150 };
+        // Helper to update text safely
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = val;
+        }
 
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.x;
-            mouse.y = event.y;
+        // Random Number Generators
+        setInterval(() => setVal('t1', Math.floor(Math.random() * (75 - 68) + 68)), 800);
+        setInterval(() => setVal('proto', Math.floor(Math.random() * 999999)), 150);
+        setInterval(() => setVal('hlth', (98 + Math.random() * 1.9).toFixed(1)), 2000);
+
+        // Status Arrays
+        const statuses = ["ENCRYPTING", "HANDSHAKE", "LOCKED", "OPTIMIZING"];
+        let sIdx = 0;
+        setInterval(() => {
+            setVal('status', statuses[sIdx]);
+            sIdx = (sIdx + 1) % statuses.length;
+        }, 1500);
+
+        const msgs = ["ENTANGLEMENT STABLE", "CALCULATING DRAG", "PHOTON EMISSION OK", "WARP READY"];
+        let mIdx = 0;
+        setInterval(() => {
+            setVal('msg', msgs[mIdx]);
+            mIdx = (mIdx + 1) % msgs.length;
+        }, 3000);
+
+        // === 2. TEXT DECRYPT EFFECT (Matrix Style) ===
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const target = document.querySelector('.decrypt-target');
+        
+        if(target) {
+            let iterations = 0;
+            const originalText = target.dataset.value;
+            const interval = setInterval(() => {
+                target.innerText = originalText.split("").map((letter, index) => {
+                    if(index < iterations) return originalText[index];
+                    return letters[Math.floor(Math.random() * letters.length)];
+                }).join("");
+                
+                if(iterations >= originalText.length) clearInterval(interval);
+                iterations += 1/5; // Speed of decryption
+            }, 50);
+        }
+
+        // === 3. CUSTOM CURSOR LOGIC ===
+        const dot = document.getElementById('cursor-dot');
+        const ring = document.getElementById('cursor-ring');
+
+        window.addEventListener('mousemove', (e) => {
+            // Move Dot instantly
+            dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            
+            // Move Ring with slight delay/offset for "feel"
+            setTimeout(() => {
+                ring.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
+            }, 50);
         });
 
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 1; // Faster movement
-                this.vy = (Math.random() - 0.5) * 1;
-                this.size = Math.random() * 2 + 1;
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.density = (Math.random() * 30) + 1;
-            }
-            update() {
-                // Standard movement
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Mouse interaction (Repulsion)
-                if (mouse.x != null) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
-                        const force = (mouse.radius - distance) / mouse.radius;
-                        const directionX = forceDirectionX * force * this.density;
-                        const directionY = forceDirectionY * force * this.density;
-                        
-                        this.x -= directionX;
-                        this.y -= directionY;
-                    }
-                }
-
-                // Boundary check
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(0, 243, 255, 0.5)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < 80; i++) particles.push(new Particle());
-        }
-        initParticles();
-
-        function animateCanvas() {
-            ctx.clearRect(0, 0, width, height);
-            
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-                
-                // Draw connections
-                for (let j = i; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist < 100) {
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${0.2 - dist/500})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animateCanvas);
-        }
-        animateCanvas();
-
-        // 3. Simulated Telemetry Data
-        setInterval(() => {
-            // Randomly fluctuate temperature
-            const temp = Math.floor(Math.random() * (65 - 40) + 40);
-            document.getElementById('temp-val').innerText = temp;
-            
-            // Randomly fluctuate ping
-            const ping = Math.floor(Math.random() * (20 - 5) + 5);
-            document.getElementById('ping-val').innerText = ping;
-        }, 1000);
-
-        // 4. GSAP Entrance Animations
-        const tl = gsap.timeline();
-
-        tl.from("nav", { y: -100, opacity: 0, duration: 1, ease: "power4.out" })
-          .from("h1", { x: -50, opacity: 0, duration: 1, ease: "power3.out" }, "-=0.5")
-          .from("p", { opacity: 0, duration: 1 }, "-=0.5")
-          .from(".btn-cyber", { scale: 0, opacity: 0, duration: 0.5, ease: "back.out(1.7)" }, "-=0.5")
-          .from(".reactor-container", { scale: 0.5, opacity: 0, rotation: 180, duration: 1.5, ease: "elastic.out(1, 0.5)" }, "-=1")
-          .from("footer", { y: 100, opacity: 0, duration: 0.8 }, "-=0.5");
-
+        // Initialize Icons
+        lucide.createIcons();
     </script>
 </body>
 </html>
