@@ -37,7 +37,19 @@
             cursor: crosshair;
         }
 
-        /* === 2. HOLOGRAPHIC ATMOSPHERE === */
+        /* === 2. BACKGROUND LAYERS === */
+        
+        /* Quantum Canvas (Particles) - Layer 1 */
+        #quantum-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* Moving 3D Grid Floor - Layer 0 */
         .cyber-grid {
             position: fixed;
             width: 200vw;
@@ -127,40 +139,26 @@
             22% { transform: skewX(0deg); filter: hue-rotate(0deg); } 100% { transform: skewX(0deg); }
         }
 
-        /* NEW SEGMENTED HEARTBEAT BAR */
+        /* CONTINUOUS LOOP BAR */
         .rpm-bar-container { 
             background: rgba(255,255,255,0.05); 
             border: 1px solid rgba(45,212,191,0.2); 
-            /* Creates the empty segment lines */
             background-image: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(0,0,0,0.8) 4px, rgba(0,0,0,0.8) 5px);
         }
         
         .rpm-fill {
             height: 100%;
-            background: var(--neon);
+            background: linear-gradient(90deg, transparent, var(--neon));
             width: 0%;
             box-shadow: 0 0 15px var(--neon);
-            /* Mask to create segments on the filled part too */
-            mask-image: repeating-linear-gradient(90deg, black, black 4px, transparent 4px, transparent 5px);
-            animation: ecg-beat 2.5s infinite linear;
+            animation: continuous-loop 2s infinite linear;
         }
 
-        /* The ECG Rhythm: Flat -> Spike -> Dip -> Spike -> Fade */
-        @keyframes ecg-beat {
-            0% { width: 0%; opacity: 0.5; }
-            10% { width: 0%; opacity: 0.5; } 
-            
-            /* First Beat (Atrium) */
-            12% { width: 20%; opacity: 1; }
-            15% { width: 10%; opacity: 0.8; }
-            
-            /* Second Beat (Ventricle - The big one) */
-            20% { width: 100%; opacity: 1; filter: brightness(1.5); }
-            25% { width: 90%; opacity: 1; }
-            
-            /* Decay */
-            60% { width: 0%; opacity: 0.2; }
-            100% { width: 0%; opacity: 0; }
+        @keyframes continuous-loop {
+            0% { width: 0%; opacity: 0.8; }
+            50% { opacity: 1; }
+            90% { width: 100%; opacity: 1; }
+            100% { width: 100%; opacity: 0; }
         }
 
         /* Buttons */
@@ -193,6 +191,8 @@
 
         <div class="cyber-grid"></div>
 
+        <canvas id="quantum-canvas"></canvas>
+
         <div class="circuit-container">
             <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="none">
                 <defs>
@@ -219,7 +219,7 @@
 
         <div class="relative z-30 min-h-screen w-full flex flex-col items-center justify-center p-4">
 
-            <div class="relative w-full max-w-2xl flex justify-between items-start mb-2 z-40 pointer-events-none md:absolute md:inset-0 md:mb-0 md:max-w-none md:block">
+            <div class="w-full max-w-4xl flex justify-between items-start mb-2 z-40 pointer-events-none md:absolute md:inset-0 md:mb-0">
                 
                 <div class="pointer-events-auto transform scale-[0.6] origin-top-left md:scale-100 md:absolute md:top-8 md:left-8">
                     <div class="hud-module p-3 w-64 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase transform -skew-x-6">
@@ -315,7 +315,76 @@
     </div>
 
     <script>
-        // --- 1. HUD & ANIMATION LOGIC ---
+        // --- 1. QUANTUM PARTICLES ---
+        const canvas = document.getElementById('quantum-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        // Resize Canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 1.5; // Random horizontal speed
+                this.speedY = (Math.random() - 0.5) * 1.5; // Random vertical speed
+                this.life = Math.random() * 100; // Life for opacity fluctuation
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Bounce off edges
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+
+                this.life++;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                
+                // Opacity Pulse
+                const alpha = (Math.sin(this.life * 0.05) + 1) / 2 * 0.5 + 0.2; 
+                ctx.fillStyle = `rgba(45, 212, 191, ${alpha})`; // Neon Teal
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = "#2dd4bf";
+                ctx.fill();
+            }
+        }
+
+        // Create initial particles
+        function initParticles() {
+            particles = [];
+            const numberOfParticles = Math.floor(window.innerWidth / 15); // Adjust density
+            for (let i = 0; i < numberOfParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+
+        // --- 2. HUD DATA UPDATES ---
         
         // Random Core Temp
         setInterval(() => {
@@ -363,7 +432,7 @@
             if(el) el.innerText = (Math.random()*(99-97)+97).toFixed(1)+"%";
         }, 3000);
 
-        // --- 2. PARALLAX EFFECT ---
+        // --- 3. PARALLAX EFFECT ---
         document.addEventListener('mousemove', function(e) {
             const root = document.getElementById('alien-f1-root');
             if(root) {
@@ -378,7 +447,7 @@
             }
         });
 
-        // --- 3. INITIALIZE ICONS ---
+        // --- 4. INITIALIZE ICONS ---
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
