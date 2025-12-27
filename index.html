@@ -18,13 +18,13 @@
             --neon-teal: #00F0FF;
             --neon-yellow: #FFE600;
             --void-bg: #050505;
-            --panel-bg: rgba(10, 15, 20, 0.6);
+            --panel-bg: rgba(6, 10, 15, 0.85);
         }
 
         body {
             background-color: var(--void-bg);
             color: white;
-            overflow: hidden; /* App-like feel */
+            overflow: hidden;
             font-family: 'Rajdhani', sans-serif;
             margin: 0;
             height: 100vh;
@@ -48,16 +48,10 @@
         @keyframes grid-scroll { from { transform: perspective(500px) rotateX(60deg) translateY(0); } to { transform: perspective(500px) rotateX(60deg) translateY(80px); } }
 
         /* === CIRCUITS (SVG) === */
-        .circuit-layer {
-            position: absolute; inset: 0; pointer-events: none; z-index: 1;
-            opacity: 0.4;
-        }
+        .circuit-layer { position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: 0.4; }
         .energy-path {
-            fill: none;
-            stroke: var(--neon-teal);
-            stroke-width: 2;
-            stroke-dasharray: 20 1000;
-            stroke-linecap: round;
+            fill: none; stroke: var(--neon-teal); stroke-width: 2;
+            stroke-dasharray: 20 1000; stroke-linecap: round;
             filter: drop-shadow(0 0 5px var(--neon-teal));
             animation: circuit-flow 3s linear infinite;
         }
@@ -68,26 +62,42 @@
         .hud-panel {
             background: var(--panel-bg);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 240, 255, 0.2);
-            border-left: 3px solid var(--neon-teal);
-            transform: skewX(-10deg);
-            transition: transform 0.2s, border-color 0.2s;
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            transition: all 0.3s ease;
         }
-        .hud-panel:hover {
-            border-color: var(--neon-yellow);
-            transform: skewX(-10deg) scale(1.02);
+        /* Left Panel Style */
+        .hud-left {
+            border-left: 3px solid var(--neon-teal);
+            transform: skewX(10deg);
+            transform-origin: left;
+        }
+        /* Right Panel Style */
+        .hud-right {
+            border-right: 3px solid var(--neon-yellow);
+            transform: skewX(-10deg);
+            transform-origin: right;
         }
         
-        .hud-text { font-family: 'Share Tech Mono', monospace; }
+        .hud-content { transform: skewX(-10deg); /* Counter skew for text */ }
+        .hud-content-right { transform: skewX(10deg); /* Counter skew for right */ }
+
+        .hud-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            margin-bottom: 4px;
+            letter-spacing: 0.05em;
+        }
+        .hud-label { color: #64748b; }
+        .hud-val { color: white; }
 
         /* === MAIN CARD === */
         .glass-card {
-            background: rgba(5, 5, 5, 0.8);
+            background: rgba(5, 5, 5, 0.85);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
-            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
             transform-style: preserve-3d;
             will-change: transform;
         }
@@ -95,15 +105,11 @@
         /* === ANIMATED GLITCH TEXT === */
         .glitch-wrapper { position: relative; display: inline-block; }
         .glitch {
-            position: relative;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 900;
-            font-style: italic;
-            z-index: 1;
+            position: relative; font-family: 'Orbitron', sans-serif;
+            font-weight: 900; font-style: italic; z-index: 1;
         }
         .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--void-bg);
         }
         .glitch::before {
@@ -116,7 +122,6 @@
             clip: rect(85px, 550px, 140px, 0);
             animation: glitch-anim 2.5s infinite linear alternate-reverse;
         }
-
         @keyframes glitch-anim {
             0% { clip: rect(12px, 9999px, 32px, 0); }
             20% { clip: rect(64px, 9999px, 10px, 0); }
@@ -128,29 +133,25 @@
 
         /* === RPM BARS === */
         .rpm-segment {
-            flex: 1; height: 100%; background: #1a1a1a;
+            flex: 1; height: 100%; background: #1e293b;
             transform: skewX(-20deg); margin: 0 1px;
             transition: background 0.1s;
         }
-        .rpm-segment.active-teal { background: var(--neon-teal); box-shadow: 0 0 5px var(--neon-teal); }
-        .rpm-segment.active-yellow { background: var(--neon-yellow); box-shadow: 0 0 5px var(--neon-yellow); }
+        .rpm-segment.active-teal { background: var(--neon-teal); box-shadow: 0 0 8px var(--neon-teal); }
+        .rpm-segment.active-yellow { background: var(--neon-yellow); box-shadow: 0 0 8px var(--neon-yellow); }
 
         /* === BUTTON === */
         .f1-btn {
-            background: transparent;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
+            background: transparent; position: relative; overflow: hidden; transition: all 0.3s;
             clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
         .f1-btn::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, var(--neon-yellow), transparent);
-            transition: 0.4s;
-            opacity: 0.4;
+            transition: 0.4s; opacity: 0.4;
         }
         .f1-btn:hover::before { left: 100%; }
-        .f1-btn:hover { background: rgba(255, 230, 0, 0.1); border-color: var(--neon-yellow); }
+        .f1-btn:hover { background: rgba(255, 230, 0, 0.05); border-color: var(--neon-yellow); box-shadow: 0 0 20px rgba(255, 230, 0, 0.2); }
 
     </style>
 </head>
@@ -165,82 +166,108 @@
         <path d="M1000,900 Q800,900 600,700 T0,500" class="energy-path" />
     </svg>
 
-    <div id="spotlight" class="fixed inset-0 pointer-events-none z-10" style="background: radial-gradient(circle 600px at var(--x, 50%) var(--y, 50%), rgba(0, 240, 255, 0.08), transparent 100%); mix-blend-mode: screen;"></div>
+    <div id="spotlight" class="fixed inset-0 pointer-events-none z-10" style="background: radial-gradient(circle 600px at var(--x, 50%) var(--y, 50%), rgba(0, 240, 255, 0.06), transparent 100%); mix-blend-mode: screen;"></div>
 
-    <div class="relative z-20 w-full max-w-7xl h-full p-4 flex flex-col justify-between">
+    <div class="relative z-20 w-full max-w-7xl h-full p-4 md:p-8 flex flex-col justify-between">
 
-        <header class="flex justify-between items-start pt-6">
-            <div class="hud-panel p-3 w-48 md:w-64 text-xs md:text-sm shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-                <div class="flex justify-between border-b border-teal-500/30 pb-1 mb-2 hud-text text-teal-400">
-                    <span>SYS.DIAG</span>
-                    <span class="text-white animate-pulse">● LIVE</span>
-                </div>
-                <div class="flex justify-between hud-text mb-1">
-                    <span class="text-gray-400">CORE_TEMP</span>
-                    <span class="text-white"><span id="temp-val">68</span>°C</span>
-                </div>
-                <div class="flex justify-between hud-text">
-                    <span class="text-gray-400">FLUX_CAP</span>
-                    <span class="text-[var(--neon-yellow)]"><span id="flux-val">98</span>%</span>
+        <header class="flex flex-col md:flex-row justify-between items-start gap-4">
+            
+            <div class="hud-panel hud-left p-3 w-64 shadow-[0_0_20px_rgba(0,240,255,0.1)]">
+                <div class="hud-content">
+                    <div class="flex justify-between border-b border-teal-500/30 pb-1 mb-2">
+                        <span class="text-teal-400 font-bold tracking-widest text-xs">HARDWARE_MONITOR</span>
+                        <span class="text-green-400 text-[10px] animate-pulse">● ONLINE</span>
+                    </div>
+                    
+                    <div class="hud-row">
+                        <span class="hud-label">CPU_TEMP</span>
+                        <span class="hud-val"><span id="cpu-temp">45</span>°C</span>
+                    </div>
+                    <div class="hud-row">
+                        <span class="hud-label">QI_TEMP</span>
+                        <span class="hud-val text-teal-300"><span id="qi-temp">12</span> mK</span>
+                    </div>
+                    <div class="hud-row">
+                        <span class="hud-label">CRYOGENIC_PUMPS</span>
+                        <span class="hud-val text-green-400">STABLE</span>
+                    </div>
+                    <div class="hud-row border-t border-white/10 pt-1 mt-1">
+                        <span class="hud-label">QI270_HEALTH</span>
+                        <span class="hud-val text-[var(--neon-yellow)] font-bold"><span id="health-val">98.4</span>%</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="hud-panel p-3 w-48 md:w-64 text-xs md:text-sm border-l-0 border-r-4 !border-r-[var(--neon-yellow)] shadow-[0_0_15px_rgba(255,230,0,0.1)] hidden md:block">
-                <div class="flex justify-between border-b border-yellow-500/30 pb-1 mb-2 hud-text text-[var(--neon-yellow)]">
-                    <span>LAB_STREAM_01</span>
-                    <span>ENCRYPTED</span>
-                </div>
-                <div class="text-right hud-text">
-                    <div class="text-gray-400 text-[10px] tracking-widest">PROTOCOL ID</div>
-                    <div id="proto-id" class="text-white font-bold">8829-XJ</div>
-                </div>
-                <div class="mt-2 h-1 w-full bg-gray-800 rounded overflow-hidden">
-                    <div class="h-full bg-[var(--neon-yellow)] animate-pulse w-3/4"></div>
+            <div class="hud-panel hud-right p-3 w-64 shadow-[0_0_20px_rgba(255,230,0,0.1)] self-end md:self-auto">
+                <div class="hud-content-right">
+                    <div class="flex justify-between border-b border-yellow-500/30 pb-1 mb-2">
+                        <span class="text-[var(--neon-yellow)] font-bold tracking-widest text-xs">LAB_DATA_STREAM_01</span>
+                        <i data-lucide="wifi" class="w-3 h-3 text-[var(--neon-yellow)]"></i>
+                    </div>
+                    
+                    <div class="hud-row">
+                        <span class="hud-label">PROTOCOL</span>
+                        <span class="hud-val" id="protocol-text">INITIATING...</span>
+                    </div>
+                    <div class="hud-row">
+                        <span class="hud-label">ENCRYPTION</span>
+                        <span class="hud-val text-teal-300 animate-pulse">ENCRYPTING...</span>
+                    </div>
+                     <div class="hud-row mt-2">
+                        <div class="w-full bg-gray-800 h-1 rounded overflow-hidden">
+                            <div class="h-full bg-[var(--neon-yellow)] w-[60%]" id="encrypt-bar"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </header>
 
-        <main class="flex-grow flex items-center justify-center perspective-container">
-            <div class="glass-card p-8 md:p-12 w-full max-w-2xl text-center group">
+        <main class="flex-grow flex items-center justify-center perspective-container py-8">
+            <div class="glass-card p-10 md:p-14 w-full max-w-3xl text-center relative group">
                 
-                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[var(--neon-teal)]"></div>
-                <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[var(--neon-teal)]"></div>
-                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[var(--neon-teal)]"></div>
-                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[var(--neon-teal)]"></div>
+                <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[var(--neon-teal)]"></div>
+                <div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[var(--neon-teal)]"></div>
+                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[var(--neon-teal)]"></div>
+                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[var(--neon-teal)]"></div>
 
-                <div class="glitch-wrapper mb-2">
-                    <h1 class="glitch text-8xl md:text-[10rem] leading-none text-white tracking-tighter" data-text="270">270</h1>
+                <div class="glitch-wrapper mb-4">
+                    <h1 class="glitch text-8xl md:text-[11rem] leading-none text-white tracking-tighter" data-text="270">270</h1>
                 </div>
                 
-                <div class="flex items-center justify-center gap-4 text-2xl md:text-4xl italic font-bold text-[var(--neon-teal)] mb-8 font-['Orbitron']">
-                    <span class="h-px w-12 bg-[var(--neon-teal)]"></span>
+                <div class="flex items-center justify-center gap-6 text-2xl md:text-3xl italic font-bold text-[var(--neon-teal)] mb-10 font-['Orbitron']">
+                    <span class="h-[2px] w-16 bg-gradient-to-r from-transparent to-[var(--neon-teal)]"></span>
                     KM/H
-                    <span class="h-px w-12 bg-[var(--neon-teal)]"></span>
+                    <span class="h-[2px] w-16 bg-gradient-to-l from-transparent to-[var(--neon-teal)]"></span>
                 </div>
 
-                <div class="h-4 w-full bg-black/50 border border-white/10 rounded mb-8 flex px-1 py-0.5" id="rpm-container">
+                <div class="relative mb-10">
+                     <div class="flex justify-between text-[10px] font-mono text-gray-500 mb-1">
+                        <span>IDLE</span>
+                        <span class="text-[var(--neon-yellow)]">REDLINE</span>
                     </div>
+                    <div class="h-6 w-full bg-black/60 border border-teal-500/30 rounded p-1 flex" id="rpm-container">
+                        </div>
+                </div>
 
-                <div class="flex justify-between items-center text-[10px] md:text-xs font-['Share_Tech_Mono'] text-gray-400 tracking-[0.2em] uppercase border-t border-white/10 pt-4 mb-8">
-                    <span>Aero_Dynamics: <span class="text-white">Active</span></span>
-                    <span>Launch: <span class="text-[var(--neon-yellow)]">2026</span></span>
+                <div class="flex justify-center items-center gap-2 mb-10">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <p class="text-teal-200 text-xs tracking-[0.4em] font-tech uppercase">Launch Sequence: <span class="text-white font-bold">2026</span></p>
                 </div>
 
                 <a href="https://www.linkedin.com/company/270kmph/" target="_blank" 
-                   class="f1-btn inline-flex items-center gap-3 px-10 py-4 border border-[var(--neon-yellow)] text-[var(--neon-yellow)] font-bold tracking-widest uppercase text-sm group">
-                    <i data-lucide="zap" class="w-4 h-4"></i>
+                   class="f1-btn inline-flex items-center gap-3 px-12 py-5 border border-[var(--neon-yellow)] text-[var(--neon-yellow)] font-bold tracking-widest uppercase text-sm group hover:scale-105 transition-transform">
+                    <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
                     <span>Confirm Attendance</span>
                 </a>
             </div>
         </main>
 
-        <footer class="pb-6 flex justify-center">
-            <div class="flex gap-1 items-end h-8">
-                <div class="w-1 bg-[var(--neon-teal)] h-3 animate-pulse"></div>
-                <div class="w-1 bg-[var(--neon-teal)] h-5 animate-pulse" style="animation-delay: 0.1s"></div>
-                <div class="w-1 bg-[var(--neon-teal)] h-8 animate-pulse" style="animation-delay: 0.2s"></div>
-                <div class="w-1 bg-[var(--neon-teal)] h-4 animate-pulse" style="animation-delay: 0.3s"></div>
-                <span class="ml-2 text-[10px] text-[var(--neon-teal)] font-['Share_Tech_Mono'] self-center">SYSTEM OPTIMAL</span>
+        <footer class="flex justify-center md:justify-end pb-4">
+            <div class="flex items-center gap-4 text-[10px] font-mono text-gray-500 bg-black/40 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm">
+                <span>SYS_STATUS: <span class="text-teal-400">ONLINE</span></span>
+                <span class="w-px h-3 bg-gray-700"></span>
+                <span>LATENCY: <span class="text-[var(--neon-yellow)]">1ms</span></span>
             </div>
         </footer>
 
@@ -250,8 +277,7 @@
         // 1. Initialize Icons
         lucide.createIcons();
 
-        // 2. Parallax & Spotlight Logic (Optimized)
-        const root = document.body;
+        // 2. Parallax & Spotlight (High Performance)
         const spotlight = document.getElementById('spotlight');
         const card = document.querySelector('.glass-card');
 
@@ -259,64 +285,70 @@
             const x = e.clientX;
             const y = e.clientY;
             
-            // Spotlight moves with cursor
             spotlight.style.setProperty('--x', `${x}px`);
             spotlight.style.setProperty('--y', `${y}px`);
 
-            // 3D Tilt Effect on Card (GSAP for smoothness)
-            const xPct = (x / window.innerWidth - 0.5) * 20; // -10 to 10 deg
-            const yPct = (y / window.innerHeight - 0.5) * -20; 
-
-            gsap.to(card, {
-                rotationY: xPct,
-                rotationX: yPct,
-                duration: 0.5,
-                ease: "power2.out"
-            });
+            // Subtle 3D tilt
+            const xPct = (x / window.innerWidth - 0.5) * 15;
+            const yPct = (y / window.innerHeight - 0.5) * -15; 
+            
+            gsap.to(card, { rotationY: xPct, rotationX: yPct, duration: 0.6, ease: "power2.out" });
         });
 
-        // 3. Dynamic RPM Bar Generator
+        // 3. RPM Bar Generation
         const rpmContainer = document.getElementById('rpm-container');
-        const totalSegments = 40;
-        
-        // Create segments
+        const totalSegments = 45;
         for(let i=0; i<totalSegments; i++) {
             let div = document.createElement('div');
             div.className = 'rpm-segment';
             rpmContainer.appendChild(div);
         }
-
         const segments = document.querySelectorAll('.rpm-segment');
 
-        // 4. Central Game Loop (Single Interval for ALL Data)
+        // 4. Game Loop - SINGLE Interval for minimal CPU usage
+        let tick = 0;
+        const protocols = ["HANDSHAKE", "VERIFYING", "SECURE_LINK", "ESTABLISHED", "INITIATING"];
+        
         setInterval(() => {
-            // Update RPM
-            const revs = Math.random() * 100; // 0 to 100%
+            tick++;
+
+            // A. Update RPM (Random fluctuation)
+            const revs = Math.random() * 100;
             const activeCount = Math.floor((revs / 100) * totalSegments);
 
             segments.forEach((seg, index) => {
                 seg.className = 'rpm-segment'; // Reset
                 if (index < activeCount) {
-                    if (index > totalSegments * 0.7) {
-                        seg.classList.add('active-yellow');
-                    } else {
-                        seg.classList.add('active-teal');
-                    }
+                    if (index > totalSegments * 0.75) seg.classList.add('active-yellow');
+                    else seg.classList.add('active-teal');
                 }
             });
 
-            // Update Random Text Numbers
-            if(Math.random() > 0.5) {
-                document.getElementById('temp-val').innerText = Math.floor(Math.random() * (90 - 60) + 60);
-                document.getElementById('flux-val').innerText = Math.floor(Math.random() * (100 - 85) + 85);
+            // B. Hardware Stats (Randomize occasionally)
+            if(tick % 5 === 0) {
+                // CPU Temp 40-70
+                document.getElementById('cpu-temp').innerText = Math.floor(Math.random() * (70 - 40) + 40);
+                // QI Temp 10-15mK
+                document.getElementById('qi-temp').innerText = Math.floor(Math.random() * (15 - 10) + 10);
             }
 
-            // Update Protocol ID occasionally
-            if(Math.random() > 0.9) {
-                document.getElementById('proto-id').innerText = Math.floor(Math.random() * 9000) + "-XJ";
+            // C. Health (Slow fluctuate)
+            if(tick % 20 === 0) {
+                document.getElementById('health-val').innerText = (98 + Math.random()).toFixed(1);
             }
 
-        }, 100); // 10 FPS update for data (enough for "tech" feel, saves CPU)
+            // D. Protocol Text (Cycle through status)
+            if(tick % 30 === 0) {
+                const protoIndex = Math.floor(Math.random() * protocols.length);
+                document.getElementById('protocol-text').innerText = protocols[protoIndex];
+            }
+
+            // E. Encryption Bar (visual noise)
+            if(tick % 2 === 0) {
+                document.getElementById('encrypt-bar').style.width = Math.floor(Math.random() * (100 - 40) + 40) + "%";
+            }
+
+        }, 100); // 10 updates per second is plenty for "tech" feel
 
     </script>
 </body>
