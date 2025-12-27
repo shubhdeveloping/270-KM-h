@@ -3,309 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>270 | QUANTUM F1</title>
+    <title>270 | QUANTUM VELOCITY</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
-        /* === CORE AESTHETICS === */
+        /* === 1. THE PHYSICS ENGINE === */
         :root {
-            --neon-teal: #00F0FF;
-            --neon-yellow: #FFE600;
-            --void-bg: #030303;
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --structure: #00F0FF; /* Teal (Base) */
+            --energy: #FFE600;    /* Yellow (Current/Highlight) */
+            --void: #020202;      /* Deep Black */
+            --carbon: #0a0a0a;
         }
 
         body {
-            background-color: var(--void-bg);
+            background-color: var(--void);
             color: white;
             font-family: 'Rajdhani', sans-serif;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
+            margin: 0;
             cursor: crosshair;
         }
 
-        /* === SCREEN FX (The Expensive Look) === */
-        .scanline {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 4px;
-            pointer-events: none; z-index: 50; opacity: 0.3;
-        }
-        .vignette {
-            position: fixed; inset: 0;
-            background: radial-gradient(circle, transparent 60%, black 100%);
-            z-index: 40; pointer-events: none;
-        }
-
-        /* === 3D GRID FLOOR === */
-        .grid-floor {
-            position: absolute; width: 200vw; height: 200vh;
-            left: -50%; top: -50%;
+        /* === 2. BACKGROUND & ATMOSPHERE === */
+        .grid-mesh {
+            position: fixed; inset: -50%; width: 200%; height: 200%;
             background-image: 
-                linear-gradient(rgba(0, 240, 255, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
-            background-size: 80px 80px;
-            transform: perspective(600px) rotateX(70deg);
-            animation: gridMove 15s linear infinite;
-            mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
-            z-index: 0;
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: perspective(1000px) rotateX(60deg);
+            animation: flight 20s linear infinite;
+            pointer-events: none; z-index: 0;
+            mask-image: radial-gradient(circle, black 0%, transparent 80%);
         }
-        @keyframes gridMove { from { transform: perspective(600px) rotateX(70deg) translateY(0); } to { transform: perspective(600px) rotateX(70deg) translateY(80px); } }
 
-        /* === DATA TYPOGRAPHY === */
-        .data-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: #64748b; letter-spacing: 0.1em; }
-        .data-val { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--neon-teal); }
-        .data-val.warn { color: var(--neon-yellow); }
+        @keyframes flight { from { transform: perspective(1000px) rotateX(60deg) translateY(0); } to { transform: perspective(1000px) rotateX(60deg) translateY(60px); } }
 
-        /* === CORNER HUD ELEMENTS === */
-        .hud-corner {
-            position: absolute;
-            padding: 20px;
-            z-index: 30;
+        /* === 3. ENERGY BEAMS (SVG) === */
+        .energy-lines {
+            position: absolute; inset: 0; pointer-events: none; z-index: 1;
+            opacity: 0.6;
         }
-        /* Positions */
-        .tl { top: 0; left: 0; text-align: left; }
-        .tr { top: 0; right: 0; text-align: right; }
-        .bl { bottom: 0; left: 0; text-align: left; }
-        .br { bottom: 0; right: 0; text-align: right; }
+        .beam {
+            fill: none;
+            stroke: var(--energy); /* YELLOW HIGHLIGHT AS REQUESTED */
+            stroke-width: 1.5;
+            stroke-dasharray: 10 200;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 8px var(--energy));
+            animation: pulse-beam 2s linear infinite;
+        }
+        @keyframes pulse-beam { to { stroke-dashoffset: -210; } }
 
-        /* Decorative Brackets */
-        .bracket {
-            position: absolute; width: 40px; height: 40px;
-            border: 1px solid var(--neon-teal); opacity: 0.5;
+        /* === 4. TYPOGRAPHY & DATA === */
+        .font-brand { font-family: 'Orbitron', sans-serif; }
+        .font-data { font-family: 'Space Mono', monospace; }
+        
+        .hud-group {
+            position: absolute; z-index: 20;
+            padding: 24px;
+            display: flex; flex-direction: column; gap: 8px;
             transition: all 0.3s;
         }
-        .tl .bracket { top: 20px; left: 20px; border-right: 0; border-bottom: 0; }
-        .tr .bracket { top: 20px; right: 20px; border-left: 0; border-bottom: 0; }
-        .bl .bracket { bottom: 20px; left: 20px; border-right: 0; border-top: 0; }
-        .br .bracket { bottom: 20px; right: 20px; border-left: 0; border-top: 0; }
-        
-        .hud-corner:hover .bracket { width: 60px; height: 60px; border-color: var(--neon-yellow); opacity: 1; box-shadow: 0 0 15px var(--neon-yellow); }
+        .hud-label { color: #555; font-size: 10px; letter-spacing: 2px; font-family: 'Space Mono'; }
+        .hud-value { color: var(--structure); font-size: 14px; font-weight: 600; font-family: 'Space Mono'; }
+        .hud-value.highlight { color: var(--energy); text-shadow: 0 0 10px rgba(255, 230, 0, 0.5); }
 
-        /* === CENTER HERO === */
-        .hero-container {
+        /* Corner Positions */
+        .top-left { top: 0; left: 0; border-left: 2px solid var(--structure); border-top: 2px solid var(--structure); border-radius: 0 0 20px 0; }
+        .top-right { top: 0; right: 0; align-items: flex-end; text-align: right; border-right: 2px solid var(--structure); border-top: 2px solid var(--structure); border-radius: 0 0 0 20px; }
+        .bottom-left { bottom: 0; left: 0; border-left: 2px solid var(--structure); border-bottom: 2px solid var(--structure); border-radius: 0 20px 0 0; }
+        .bottom-right { bottom: 0; right: 0; align-items: flex-end; text-align: right; border-right: 2px solid var(--structure); border-bottom: 2px solid var(--structure); border-radius: 20px 0 0 0; }
+
+        /* === 5. CENTERPIECE === */
+        .core-container {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center; z-index: 30;
+            z-index: 30;
+            text-align: center;
             width: 100%;
         }
 
-        /* Glitch Title */
-        .glitch-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 12vw; font-weight: 900;
-            font-style: italic; line-height: 0.8;
-            color: white; text-shadow: 4px 4px 0px rgba(0, 240, 255, 0.3);
+        .main-title {
+            font-size: 12vw;
+            line-height: 0.8;
+            font-weight: 900;
+            font-style: italic;
+            background: linear-gradient(to bottom, white, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             position: relative;
         }
+        
+        .main-title::after {
+            content: '270'; position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            z-index: -1; color: transparent;
+            text-shadow: 3px 3px 0px var(--structure), -2px -2px 0 var(--energy);
+            opacity: 0.6; mix-blend-mode: screen;
+            animation: glitch-shake 3s infinite;
+        }
 
-        /* === COMPILING BAR === */
-        .compile-box {
+        @keyframes glitch-shake {
+            0% { transform: translate(0,0); }
+            95% { transform: translate(0,0); }
+            96% { transform: translate(-2px, 2px); }
+            97% { transform: translate(2px, -2px); }
+            98% { transform: translate(0, 2px); }
+            100% { transform: translate(0,0); }
+        }
+
+        /* === 6. COMPILING BAR (The 49%) === */
+        .compiler-ui {
             margin-top: 40px;
-            display: inline-block;
-            background: rgba(0,0,0,0.6);
+            display: inline-flex; flex-direction: column; align-items: flex-start;
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 20px;
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.8);
+            padding: 15px 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .progress-track {
-            width: 200px; height: 4px; background: #333;
-            margin-top: 8px; position: relative; overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%; width: 49%; background: var(--neon-yellow);
+        
+        .bar-track { width: 250px; height: 6px; background: #222; margin: 8px 0; overflow: hidden; position: relative; }
+        
+        /* The Yellow Highlight Bar */
+        .bar-fill {
+            height: 100%; width: 49%; 
+            background: var(--energy);
+            box-shadow: 0 0 15px var(--energy);
             position: relative;
-            box-shadow: 0 0 10px var(--neon-yellow);
         }
-        .progress-fill::after {
-            content: ''; position: absolute; top:0; right:0; height:100%; width: 2px; background: white;
-            animation: blink 0.1s infinite;
+        /* The Vibration Effect */
+        .bar-fill { animation: stall-vibrate 0.1s infinite; }
+        
+        @keyframes stall-vibrate {
+            0% { width: 49%; }
+            50% { width: 48.8%; opacity: 0.9; }
+            100% { width: 49.2%; opacity: 1; }
         }
 
-        /* === BUTTON === */
-        .cyber-btn {
+        /* === 7. BUTTON === */
+        .f1-cta {
             margin-top: 30px;
-            display: inline-flex; align-items: center; gap: 10px;
-            padding: 15px 40px;
             background: transparent;
-            border: 1px solid var(--neon-teal);
-            color: var(--neon-teal);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700; letter-spacing: 2px;
+            color: white;
+            border: 1px solid var(--structure);
+            padding: 15px 40px;
+            font-family: 'Orbitron'; font-weight: 700; letter-spacing: 2px;
             text-transform: uppercase;
-            transition: 0.3s;
             position: relative; overflow: hidden;
+            transition: 0.3s;
         }
-        .cyber-btn:hover { background: var(--neon-teal); color: black; box-shadow: 0 0 30px var(--neon-teal); }
+        .f1-cta:hover { background: var(--structure); color: black; box-shadow: 0 0 30px var(--structure); }
+        .f1-cta::before {
+            content: ''; position: absolute; top:0; left:-100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, var(--energy), transparent);
+            transition: 0.5s; opacity: 0.5;
+        }
+        .f1-cta:hover::before { left: 100%; }
 
     </style>
 </head>
 <body>
 
-    <div class="scanline"></div>
-    <div class="vignette"></div>
-    <div class="grid-floor"></div>
+    <div class="grid-mesh"></div>
+    
+    <svg class="energy-lines" width="100%" height="100%">
+        <line x1="0" y1="0" x2="50%" y2="50%" class="beam" />
+        <line x1="100%" y1="0" x2="50%" y2="50%" class="beam" style="animation-delay: 0.5s" />
+        <line x1="0" y1="100%" x2="50%" y2="50%" class="beam" style="animation-delay: 1s" />
+        <line x1="100%" y1="100%" x2="50%" y2="50%" class="beam" style="animation-delay: 1.5s" />
+    </svg>
 
-    <div id="spotlight" style="position:fixed; inset:0; background: radial-gradient(circle 800px at var(--x, 50%) var(--y, 50%), rgba(0, 240, 255, 0.05), transparent 100%); pointer-events: none; z-index: 10; mix-blend-mode: screen;"></div>
+    <div id="spotlight" style="position:fixed; inset:0; background: radial-gradient(circle 800px at var(--x, 50%) var(--y, 50%), rgba(0, 240, 255, 0.04), transparent 100%); pointer-events: none; mix-blend-mode: screen;"></div>
 
-    <div class="hud-corner tl hidden md:block">
-        <div class="bracket"></div>
-        <div class="ml-4 mt-4 flex flex-col gap-2">
-            <div>
-                <div class="data-label">SYSTEM_STATUS</div>
-                <div class="data-val text-green-400 animate-pulse">● ONLINE</div>
-            </div>
-            <div class="h-px w-20 bg-white/10 my-1"></div>
-            <div>
-                <div class="data-label">CRYOGENIC_PUMPS</div>
-                <div class="data-val">PRESSURE_STABLE</div>
-            </div>
-            <div>
-                <div class="data-label">QI270_HEALTH</div>
-                <div class="data-val warn text-lg"><span id="health">98.2</span>%</div>
-            </div>
+    <div class="hud-group top-left hidden md:flex">
+        <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="cpu" class="w-4 h-4 text-[var(--structure)]"></i>
+            <span class="hud-label text-white">SYSTEM_HARDWARE</span>
+        </div>
+        <div>
+            <div class="hud-label">CPU_TEMP</div>
+            <div class="hud-value"><span id="cpu-temp">42</span>°C</div>
+        </div>
+        <div>
+            <div class="hud-label">CRYOGENIC_PUMPS</div>
+            <div class="hud-value text-green-400">STABLE</div>
         </div>
     </div>
 
-    <div class="hud-corner tr hidden md:block">
-        <div class="bracket"></div>
-        <div class="mr-4 mt-4 flex flex-col gap-2 items-end">
-            <div>
-                <div class="data-label">CPU_TEMP</div>
-                <div class="data-val"><span id="cpu">42</span>°C</div>
-            </div>
-            <div>
-                <div class="data-label">QI_TEMP</div>
-                <div class="data-val text-blue-300"><span id="qi">12</span> mK</div>
-            </div>
-            <div class="h-px w-20 bg-white/10 my-1"></div>
-            <div class="text-right">
-                <div class="data-label">LOCATION</div>
-                <div class="data-val">GRID_SECTOR_7</div>
-            </div>
+    <div class="hud-group top-right hidden md:flex">
+        <div class="flex items-center gap-2 mb-2 justify-end">
+            <span class="hud-label text-white">ENVIRONMENT</span>
+            <i data-lucide="thermometer" class="w-4 h-4 text-[var(--structure)]"></i>
+        </div>
+        <div>
+            <div class="hud-label">QI_TEMP</div>
+            <div class="hud-value"><span id="qi-temp">12</span> mK</div>
+        </div>
+        <div>
+            <div class="hud-label">QI270_HEALTH</div>
+            <div class="hud-value highlight"><span id="health">98.4</span>%</div>
         </div>
     </div>
 
-    <div class="hud-corner bl hidden md:block">
-        <div class="bracket"></div>
-        <div class="ml-4 mb-4 flex flex-col gap-2">
-            <div>
-                <div class="data-label">LAB_DATA_STREAM_01</div>
-                <div class="data-val flex items-center gap-2">
-                    <span id="stream-txt" class="w-32 truncate">RX_PACKET_99</span>
-                    <i data-lucide="activity" class="w-3 h-3 text-[var(--neon-teal)]"></i>
-                </div>
+    <div class="hud-group bottom-left hidden md:flex">
+        <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="database" class="w-4 h-4 text-[var(--structure)]"></i>
+            <span class="hud-label text-white">LAB_DATA_STREAM_01</span>
+        </div>
+        <div>
+            <div class="hud-label">ENCRYPTION</div>
+            <div class="hud-value flex items-center gap-2 text-[var(--structure)]">
+                ENCRYPTING <span class="animate-pulse w-2 h-2 bg-[var(--structure)] rounded-full"></span>
             </div>
-            <div>
-                <div class="data-label">ENCRYPTION</div>
-                <div class="data-val warn">
-                    ENCRYPTING<span class="animate-pulse">...</span>
-                </div>
-                <div class="w-32 h-1 bg-gray-800 mt-1">
-                    <div class="h-full bg-[var(--neon-yellow)]" style="width: 75%" id="enc-bar"></div>
-                </div>
-            </div>
+        </div>
+        <div class="w-32 h-1 bg-gray-800 mt-1 overflow-hidden">
+            <div id="enc-bar" class="h-full bg-[var(--structure)] w-2/3"></div>
         </div>
     </div>
 
-    <div class="hud-corner br hidden md:block">
-        <div class="bracket"></div>
-        <div class="mr-4 mb-4 flex flex-col gap-2 items-end">
-            <div>
-                <div class="data-label">CURRENT_PROTOCOL</div>
-                <div class="data-val" id="proto">INITIATING</div>
-            </div>
-            <div class="flex gap-1 mt-1">
-                <div class="w-1 h-4 bg-[var(--neon-teal)] animate-pulse"></div>
-                <div class="w-1 h-3 bg-[var(--neon-teal)] animate-pulse" style="animation-delay: 0.1s"></div>
-                <div class="w-1 h-5 bg-[var(--neon-teal)] animate-pulse" style="animation-delay: 0.2s"></div>
-            </div>
+    <div class="hud-group bottom-right hidden md:flex">
+        <div class="flex items-center gap-2 mb-2 justify-end">
+            <span class="hud-label text-white">SYSTEM_STATUS</span>
+            <i data-lucide="wifi" class="w-4 h-4 text-[var(--structure)]"></i>
+        </div>
+        <div>
+            <div class="hud-label">STATUS</div>
+            <div class="hud-value text-green-400">ONLINE</div>
+        </div>
+        <div>
+            <div class="hud-label">PROTOCOL</div>
+            <div class="hud-value" id="protocol">HANDSHAKE</div>
         </div>
     </div>
 
-    <div class="hero-container">
+    <div class="core-container">
         
-        <div class="md:hidden flex justify-center gap-4 text-[10px] font-mono text-gray-400 mb-6">
+        <div class="md:hidden flex justify-center gap-4 text-[10px] font-mono text-gray-500 mb-8 border-b border-white/10 pb-2 mx-10">
             <span>SYS: <span class="text-green-400">OK</span></span>
-            <span>TEMP: <span class="text-white">45°C</span></span>
-            <span>HLTH: <span class="text-[var(--neon-yellow)]">98%</span></span>
+            <span>TEMP: <span class="text-[var(--structure)]">45°C</span></span>
+            <span>HLTH: <span class="text-[var(--energy)]">98%</span></span>
         </div>
 
-        <h1 class="glitch-text">270</h1>
+        <h1 class="font-brand main-title">270</h1>
         
-        <div class="flex items-center justify-center gap-4 text-[var(--neon-teal)] font-['Orbitron'] font-bold tracking-widest text-lg md:text-2xl mt-[-10px] mb-8">
-            <i data-lucide="zap" class="w-4 h-4 md:w-6 md:h-6 fill-current"></i>
-            KM/H // QUANTUM
-            <i data-lucide="zap" class="w-4 h-4 md:w-6 md:h-6 fill-current"></i>
+        <div class="flex justify-center items-center gap-3 mt-[-5px] mb-6">
+            <div class="h-[1px] w-10 bg-[var(--structure)]"></div>
+            <span class="text-[var(--structure)] font-brand tracking-[0.3em] font-bold text-lg">KM/H</span>
+            <div class="h-[1px] w-10 bg-[var(--structure)]"></div>
         </div>
 
-        <div class="compile-box text-left">
-            <div class="flex justify-between items-end text-[10px] font-mono text-[var(--neon-yellow)] mb-1">
-                <span>SYSTEM COMPILING</span>
-                <span class="animate-pulse">49%</span>
+        <div class="compiler-ui group">
+            <div class="flex justify-between w-full text-[10px] font-data mb-1">
+                <span class="text-gray-400">SYSTEM_COMPILING</span>
+                <span class="text-[var(--energy)] font-bold animate-pulse">49%</span> </div>
+            
+            <div class="bar-track">
+                <div class="bar-fill"></div>
             </div>
-            <div class="progress-track">
-                <div class="progress-fill"></div>
-            </div>
-            <div class="text-[9px] text-gray-500 font-mono mt-1 tracking-widest">
-                > OPTIMIZING AERODYNAMICS...
+            
+            <div class="flex items-center gap-2 mt-2">
+                <i data-lucide="loader-2" class="w-3 h-3 text-[var(--structure)] animate-spin"></i>
+                <span class="text-[9px] font-data text-[var(--structure)] tracking-widest">AWAITING QUANTUM SYNC...</span>
             </div>
         </div>
 
         <br>
 
-        <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="cyber-btn group">
+        <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="f1-cta inline-flex items-center gap-3 group">
             <span>Confirm Attendance</span>
-            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform text-[var(--energy)]"></i>
         </a>
 
     </div>
 
     <script>
-        // Init Icons
+        // 1. Icons
         lucide.createIcons();
 
-        // Spotlight Logic
+        // 2. Mouse Spotlight
         document.addEventListener('mousemove', (e) => {
-            document.getElementById('spotlight').style.setProperty('--x', e.clientX + 'px');
-            document.getElementById('spotlight').style.setProperty('--y', e.clientY + 'px');
+            const spot = document.getElementById('spotlight');
+            spot.style.setProperty('--x', e.clientX + 'px');
+            spot.style.setProperty('--y', e.clientY + 'px');
+            
+            // Subtle Grid Parallax
+            const moveX = (e.clientX / window.innerWidth - 0.5) * 20;
+            const moveY = (e.clientY / window.innerHeight - 0.5) * 20;
+            gsap.to('.grid-mesh', { x: moveX, y: moveY, duration: 1 });
         });
 
-        // Data Randomizer Loop (Single Efficient Loop)
-        const protocols = ["HANDSHAKE", "VERIFYING", "SECURE_LINK", "ESTABLISHED"];
-        const streams = ["RX_PACKET_82", "KEY_GEN_X9", "BUFFER_FLUSH", "QUANTUM_SYNC"];
+        // 3. Data Simulation Loop
+        const protocols = ["HANDSHAKE", "VERIFYING", "SECURE", "LINKED"];
         
         setInterval(() => {
-            // Hardware Jitter
-            if(Math.random() > 0.5) document.getElementById('cpu').innerText = Math.floor(Math.random() * (60 - 40) + 40);
-            if(Math.random() > 0.5) document.getElementById('qi').innerText = Math.floor(Math.random() * (15 - 10) + 10);
+            // Randomize Temps
+            if(Math.random() > 0.5) document.getElementById('cpu-temp').innerText = Math.floor(Math.random() * (65 - 40) + 40);
+            if(Math.random() > 0.6) document.getElementById('qi-temp').innerText = Math.floor(Math.random() * (15 - 10) + 10);
             
-            // Health Slow Drift
-            if(Math.random() > 0.8) document.getElementById('health').innerText = (97 + Math.random() * 2).toFixed(1);
+            // Randomize Health (Keep it high)
+            if(Math.random() > 0.8) document.getElementById('health').innerText = (97 + Math.random() * 2.9).toFixed(1);
 
-            // Text Cycles
-            if(Math.random() > 0.9) document.getElementById('proto').innerText = protocols[Math.floor(Math.random() * protocols.length)];
-            if(Math.random() > 0.8) document.getElementById('stream-txt').innerText = streams[Math.floor(Math.random() * streams.length)];
+            // Encryption Bar Movement
+            document.getElementById('enc-bar').style.width = Math.floor(Math.random() * (80 - 40) + 40) + "%";
 
-            // Encryption Bar Jitter
-            document.getElementById('enc-bar').style.width = Math.floor(Math.random() * (90 - 60) + 60) + "%";
+            // Protocol Text
+            if(Math.random() > 0.9) document.getElementById('protocol').innerText = protocols[Math.floor(Math.random() * protocols.length)];
 
         }, 150);
 
-        // Compiling Bar Glitch Effect (Locks at 49% but jitters slightly)
-        const barFill = document.querySelector('.progress-fill');
-        setInterval(() => {
-            // Jitter between 48.5% and 49.5% to look like it's trying to push past
-            const jitter = 49 + (Math.random() * 0.8 - 0.4);
-            barFill.style.width = jitter + "%";
-        }, 50);
+        // 4. Intro Animation
+        gsap.from(".main-title", { duration: 1.5, y: 50, opacity: 0, ease: "power4.out", delay: 0.2 });
+        gsap.from(".compiler-ui", { duration: 1, scale: 0.8, opacity: 0, ease: "back.out(1.7)", delay: 0.8 });
+        gsap.from(".hud-group", { duration: 1, opacity: 0, stagger: 0.2, delay: 1 });
 
     </script>
 </body>
