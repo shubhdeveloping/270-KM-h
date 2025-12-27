@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>270 | QUANTUM VELOCITY</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* === 1. THE PHYSICS ENGINE (Global Styles) === */
+        :root {
+            --void: #030303;
+            --carbon: #0a0a0a;
+            --f1-teal: #00F0FF;
+            --f1-yellow: #FFE600;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--void);
+            color: white;
+            font-family: 'Space Mono', monospace;
+            overflow: hidden; /* Immersive single screen */
+            height: 100vh;
+            cursor: none; /* We build our own cursor */
+        }
+
+        /* Custom Cursor */
+        #cursor-dot, #cursor-ring {
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #cursor-dot { width: 4px; height: 4px; background: var(--f1-yellow); }
+        #cursor-ring { 
+            width: 40px; height: 40px; 
+            border: 1px solid var(--f1-teal); 
+            transition: width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+
+        /* Typography Override */
+        .font-luxury { font-family: 'Syncopate', sans-serif; }
+        .font-data { font-family: 'Space Mono', monospace; }
+
+        /* === 2. QUANTUM GRID (Background) === */
+        .world-container {
+            position: absolute;
+            inset: 0;
+            perspective: 1000px;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .grid-floor {
+            position: absolute;
+            width: 300%;
+            height: 300%;
+            left: -100%;
+            top: -50%;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+            background-size: 100px 100px;
+            transform: rotateX(75deg);
+            animation: speed 4s linear infinite;
+            mask-image: radial-gradient(circle at 50% 50%, black 10%, transparent 60%);
+        }
+
+        @keyframes speed {
+            0% { transform: rotateX(75deg) translateY(0); }
+            100% { transform: rotateX(75deg) translateY(100px); }
+        }
+
+        /* === 3. UI LUXURY GLASS === */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        /* The "Caution" Striping */
+        .hazard-strip {
+            background: repeating-linear-gradient(
+                45deg,
+                var(--f1-yellow),
+                var(--f1-yellow) 2px,
+                transparent 2px,
+                transparent 8px
+            );
+            opacity: 0.8;
+        }
+
+        /* === 4. GLOW EFFECTS === */
+        .neon-text-teal { text-shadow: 0 0 20px rgba(0, 240, 255, 0.5); }
+        .neon-text-yellow { text-shadow: 0 0 20px rgba(255, 230, 0, 0.5); }
+        
+        .hero-glitch {
+            position: relative;
+            color: white;
+            mix-blend-mode: exclusion;
+        }
+        
+        /* === 5. UTILITY CLASSES === */
+        .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }
+        
+        /* Loading Overlay */
+        #preloader {
+            position: fixed; inset: 0; background: var(--void); z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .loader-bar { width: 0%; height: 2px; background: var(--f1-teal); }
+
+    </style>
+</head>
+<body class="antialiased selection:bg-teal-500 selection:text-black">
+
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <div id="preloader">
+        <div class="w-64">
+            <div class="flex justify-between text-[10px] text-teal-500 mb-2 font-data">
+                <span>SYSTEM_BOOT</span>
+                <span id="loader-percent">0%</span>
+            </div>
+            <div class="w-full bg-gray-900 h-[2px]">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="world-container">
+        <div class="grid-floor"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[var(--void)] via-transparent to-[var(--void)]"></div>
+        <canvas id="noise-canvas" class="absolute inset-0 opacity-20 pointer-events-none"></canvas>
+    </div>
+
+    <main class="relative z-10 w-full h-full flex flex-col justify-between p-6 md:p-12">
+
+        <header class="flex justify-between items-start opacity-0" id="header-ui">
+            <div class="flex gap-4">
+                <div class="w-1 h-12 bg-teal-400 hazard-strip"></div>
+                <div>
+                    <h2 class="font-luxury text-xl tracking-widest leading-none">MK.IV</h2>
+                    <p class="text-[10px] text-gray-500 font-data tracking-[0.2em] mt-1">QUANTUM TELEMETRY</p>
+                </div>
+            </div>
+
+            <div class="glass-panel px-4 py-2 hidden md:block transform skew-x-[-10deg]">
+                <div class="flex gap-6 text-[10px] font-data transform skew-x-[10deg]">
+                    <div class="flex flex-col items-end">
+                        <span class="text-gray-500">LATENCY</span>
+                        <span class="text-[var(--f1-yellow)]">1.2ms</span>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="text-gray-500">SERVER</span>
+                        <span class="text-teal-400">VERCEL_EDGE_HK</span>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="text-gray-500">STATUS</span>
+                        <span class="animate-pulse text-green-400">OPTIMAL</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl text-center perspective-container">
+            
+            <div class="relative inline-block group cursor-none">
+                <h1 class="font-luxury text-[15vw] leading-[0.8] tracking-tighter mix-blend-screen opacity-0" id="hero-text">
+                    270
+                    <span class="text-[var(--f1-yellow)] text-[4vw] absolute top-0 -right-8 md:-right-16 align-top opacity-80" style="font-style: italic;">km/h</span>
+                </h1>
+
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-teal-500/20 rounded-full scale-0" id="halo-1"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border border-[var(--f1-yellow)] opacity-10 rounded-full scale-0" style="border-style: dashed;" id="halo-2"></div>
+            </div>
+
+            <div class="mt-8 flex flex-col items-center opacity-0" id="hero-sub">
+                <p class="font-data text-teal-300 text-xs md:text-sm tracking-[0.5em] uppercase mb-6">
+                    Aerodynamics <span class="text-gray-600 px-2">//</span> Quantum Computing
+                </p>
+                
+                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" 
+                   class="group relative inline-flex items-center gap-3 px-8 py-4 bg-transparent overflow-hidden border border-teal-500/30 hover:border-teal-400 transition-colors duration-300">
+                    
+                    <div class="absolute inset-0 bg-teal-500/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
+                    
+                    <span class="absolute top-0 left-0 w-2 h-2 border-t border-l border-teal-400"></span>
+                    <span class="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-teal-400"></span>
+
+                    <span class="relative z-10 font-luxury text-sm font-bold tracking-widest uppercase text-white group-hover:text-teal-200">
+                        Initiate Sequence
+                    </span>
+                    <i data-lucide="arrow-right" class="relative z-10 w-4 h-4 text-[var(--f1-yellow)] group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+        </section>
+
+        <footer class="flex justify-between items-end opacity-0" id="footer-ui">
+            
+            <div class="hidden md:block w-64">
+                <div class="flex justify-between text-[10px] font-data text-gray-500 mb-1">
+                    <span>ENGINE_LOAD</span>
+                    <span id="rpm-text">0%</span>
+                </div>
+                <div class="flex gap-[2px] h-4 items-end">
+                    <div class="rpm-bars flex gap-[2px] h-full w-full items-end"></div>
+                </div>
+            </div>
+
+            <div class="md:hidden text-[10px] text-gray-600 font-data">
+                SCROLL TO ENGAGE
+            </div>
+
+            <div class="text-right">
+                <div class="flex flex-col gap-1 text-[10px] font-data text-gray-400">
+                    <p>X: <span id="coord-x" class="text-teal-500">00.00</span></p>
+                    <p>Y: <span id="coord-y" class="text-teal-500">00.00</span></p>
+                    <p class="text-[var(--f1-yellow)] mt-2">SECURE_CONNECTION</p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        /* === 1. INITIALIZATION & LOGIC === */
+        
+        // Icons
+        lucide.createIcons();
+
+        // Cursor Logic
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        
+        document.addEventListener('mousemove', (e) => {
+            // GSAP is smoother than standard CSS for mouse following
+            gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.1 });
+            gsap.to(cursorRing, { x: e.clientX, y: e.clientY, duration: 0.3, ease: "power2.out" });
+            
+            // Update Coordinates
+            document.getElementById('coord-x').innerText = (e.clientX / window.innerWidth * 100).toFixed(2);
+            document.getElementById('coord-y').innerText = (e.clientY / window.innerHeight * 100).toFixed(2);
+            
+            // Parallax Effect on Hero
+            const moveX = (e.clientX - window.innerWidth / 2) * 0.02;
+            const moveY = (e.clientY - window.innerHeight / 2) * 0.02;
+            gsap.to('.perspective-container', { 
+                rotationY: moveX, 
+                rotationX: -moveY, 
+                ease: "power1.out", 
+                duration: 1 
+            });
+        });
+
+        /* === 2. RPM GAUGE GENERATOR === */
+        const rpmContainer = document.querySelector('.rpm-bars');
+        for(let i=0; i<30; i++) {
+            const bar = document.createElement('div');
+            bar.className = `w-1 bg-teal-900/50 transition-all duration-75`;
+            bar.style.height = '20%';
+            bar.id = `bar-${i}`;
+            rpmContainer.appendChild(bar);
+        }
+
+        // RPM Animation Loop
+        setInterval(() => {
+            const activeBars = Math.floor(Math.random() * 20) + 5; // Random engine noise
+            const rpmPercent = Math.floor((activeBars / 30) * 100);
+            document.getElementById('rpm-text').innerText = rpmPercent + "%";
+            
+            for(let i=0; i<30; i++) {
+                const bar = document.getElementById(`bar-${i}`);
+                if(i < activeBars) {
+                    // Color logic: Teal -> Yellow -> Red (if very high)
+                    if (i > 24) bar.style.backgroundColor = 'var(--f1-yellow)';
+                    else bar.style.backgroundColor = 'var(--f1-teal)';
+                    
+                    bar.style.height = Math.random() > 0.5 ? '80%' : '100%';
+                    bar.style.opacity = '1';
+                } else {
+                    bar.style.backgroundColor = '#0f172a';
+                    bar.style.height = '20%';
+                    bar.style.opacity = '0.3';
+                }
+            }
+        }, 100);
+
+        /* === 3. INTRO ANIMATION SEQUENCE (The €100k Reveal) === */
+        
+        // Simulating Asset Load
+        let loadProgress = 0;
+        const loaderInterval = setInterval(() => {
+            loadProgress += Math.floor(Math.random() * 10) + 5;
+            if(loadProgress > 100) loadProgress = 100;
+            
+            document.querySelector('.loader-bar').style.width = loadProgress + '%';
+            document.getElementById('loader-percent').innerText = loadProgress + '%';
+
+            if(loadProgress === 100) {
+                clearInterval(loaderInterval);
+                runIntro();
+            }
+        }, 150);
+
+        function runIntro() {
+            const tl = gsap.timeline();
+
+            // 1. Remove Preloader
+            tl.to('#preloader', { yPercent: -100, duration: 1, ease: "power4.inOut" })
+            
+            // 2. Reveal Hero Text (Split text effect simulation)
+            .to('#hero-text', { opacity: 1, duration: 1, clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" })
+            
+            // 3. Expand Halos
+            .to('#halo-1', { scale: 1, rotation: 360, duration: 2, ease: "expo.out" }, "-=0.5")
+            .to('#halo-2', { scale: 1, rotation: -180, duration: 2.5, ease: "expo.out" }, "-=1.8")
+            
+            // 4. Reveal UI Elements
+            .to(['#header-ui', '#footer-ui', '#hero-sub'], { opacity: 1, y: 0, stagger: 0.2, duration: 0.8 });
+        }
+
+        /* === 4. CANVAS NOISE (Texture) === */
+        const canvas = document.getElementById('noise-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawNoise() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const idata = ctx.createImageData(w, h);
+            const buffer32 = new Uint32Array(idata.data.buffer);
+            const len = buffer32.length;
+
+            for (let i = 0; i < len; i++) {
+                if (Math.random() < 0.05) {
+                    buffer32[i] = 0xffffffff; // White noise
+                }
+            }
+            ctx.putImageData(idata, 0, 0);
+            requestAnimationFrame(drawNoise);
+        }
+        // Lower frame rate for noise to save battery
+        setInterval(() => { requestAnimationFrame(drawNoise); }, 100);
+
+    </script>
+</body>
+</html>
