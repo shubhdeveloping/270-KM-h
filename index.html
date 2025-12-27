@@ -219,44 +219,42 @@
 
         <div class="relative z-30 min-h-screen w-full flex flex-col items-center justify-center p-4">
 
-            <div class="w-full max-w-4xl flex justify-between items-start mb-2 z-40 pointer-events-none md:absolute md:inset-0 md:mb-0">
-                
-                <div class="pointer-events-auto transform scale-[0.6] origin-top-left md:scale-100 md:absolute md:top-8 md:left-8">
-                    <div class="hud-module p-3 w-64 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase transform -skew-x-6">
-                        <div class="flex flex-col gap-1 not-italic skew-x-6">
-                            <div class="border-b border-teal-500/30 pb-1 mb-1 flex justify-between">
-                                <span>SYS.DIAGNOSTICS</span><span class="animate-pulse text-white">● REC</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>CORE_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>QUANTUM_FLUX</span><span class="text-teal-300"><span id="t2">15</span> mK</span>
-                            </div>
-                            <div class="mt-2 text-xs text-teal-400 border-t border-teal-500/30 pt-1">
-                                <span class="mr-2">></span><span id="msg">INITIALIZING...</span>
-                            </div>
+            <div class="absolute top-4 left-4 z-40 origin-top-left transform scale-50 md:scale-100 md:top-8 md:left-8">
+                <div class="hud-module p-3 w-64 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase transform -skew-x-6">
+                    <div class="flex flex-col gap-1 not-italic skew-x-6">
+                        <div class="border-b border-teal-500/30 pb-1 mb-1 flex justify-between">
+                            <span>SYS.DIAGNOSTICS</span><span class="animate-pulse text-white">● REC</span>
                         </div>
-                    </div>
-                </div>
-
-                <div class="pointer-events-auto transform scale-[0.6] origin-top-right md:scale-100 md:absolute md:top-8 md:right-8">
-                    <div class="hud-module p-3 w-56 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 transform -skew-x-6">
-                        <div class="flex flex-col gap-1 skew-x-6">
-                            <div class="border-b border-teal-500/30 pb-1 mb-1 text-teal-600 text-right">LAB_DATA_STREAM_01</div>
-                            <div class="text-xs text-white mb-1 text-right">PROT_ID: <span id="proto" class="text-teal-300 font-mono">76266262</span></div>
-                            <div class="flex items-center justify-end gap-2">
-                                <span id="status" class="text-teal-400">SCANNING...</span>
-                                <div class="w-1.5 h-1.5 bg-teal-400 animate-ping rounded-full"></div>
-                            </div>
-                            <div class="mt-2 pt-1 border-t border-teal-500/30 flex justify-between items-center">
-                                <span class="text-gray-400">QI270 INTEG:</span>
-                                <span id="hlth" class="text-green-400 font-bold font-sporty text-lg">95.0%</span>
-                            </div>
+                        <div class="flex justify-between items-center">
+                            <span>CORE_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>QUANTUM_FLUX</span><span class="text-teal-300"><span id="t2">15</span> mK</span>
+                        </div>
+                        <div class="mt-2 text-xs text-teal-400 border-t border-teal-500/30 pt-1">
+                            <span class="mr-2">></span><span id="msg">INITIALIZING...</span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="absolute top-4 right-4 z-40 origin-top-right transform scale-50 md:scale-100 md:top-8 md:right-8">
+                <div class="hud-module p-3 w-56 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 transform -skew-x-6">
+                    <div class="flex flex-col gap-1 skew-x-6">
+                        <div class="border-b border-teal-500/30 pb-1 mb-1 text-teal-600 text-right">LAB_DATA_STREAM_01</div>
+                        <div class="text-xs text-white mb-1 text-right">PROT_ID: <span id="proto" class="text-teal-300 font-mono">76266262</span></div>
+                        <div class="flex items-center justify-end gap-2">
+                            <span id="status" class="text-teal-400">SCANNING...</span>
+                            <div class="w-1.5 h-1.5 bg-teal-400 animate-ping rounded-full"></div>
+                        </div>
+                        <div class="mt-2 pt-1 border-t border-teal-500/30 flex justify-between items-center">
+                            <span class="text-gray-400">QI270 INTEG:</span>
+                            <span id="hlth" class="text-green-400 font-bold font-sporty text-lg">95.0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
             <div class="aug-card p-8 md:p-16 max-w-2xl w-full group collision-target">
                 <div class="tech-bracket tb-tl"></div>
@@ -333,9 +331,9 @@
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 1.5; // Random horizontal speed
-                this.speedY = (Math.random() - 0.5) * 1.5; // Random vertical speed
-                this.life = Math.random() * 100; // Life for opacity fluctuation
+                this.speedX = (Math.random() - 0.5) * 1.5; 
+                this.speedY = (Math.random() - 0.5) * 1.5; 
+                this.life = Math.random() * 100; 
             }
 
             update() {
