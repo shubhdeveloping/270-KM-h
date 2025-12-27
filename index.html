@@ -3,370 +3,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>270 | QUANTUM VELOCITY</title>
+    <title>270 | QUANTUM F1</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
-        /* === 1. THE PHYSICS ENGINE (Global Styles) === */
+        /* === CORE ENGINE === */
         :root {
-            --void: #030303;
-            --carbon: #0a0a0a;
-            --f1-teal: #00F0FF;
-            --f1-yellow: #FFE600;
-            --glass: rgba(255, 255, 255, 0.03);
+            --neon-teal: #00F0FF;
+            --neon-yellow: #FFE600;
+            --void-bg: #050505;
+            --panel-bg: rgba(10, 15, 20, 0.6);
         }
 
-        body, html {
+        body {
+            background-color: var(--void-bg);
+            color: white;
+            overflow: hidden; /* App-like feel */
+            font-family: 'Rajdhani', sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: var(--void);
-            color: white;
-            font-family: 'Space Mono', monospace;
-            overflow: hidden; /* Immersive single screen */
             height: 100vh;
-            cursor: none; /* We build our own cursor */
+            width: 100vw;
         }
 
-        /* Custom Cursor */
-        #cursor-dot, #cursor-ring {
-            position: fixed;
-            top: 0; left: 0;
-            pointer-events: none;
-            z-index: 9999;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-        }
-        #cursor-dot { width: 4px; height: 4px; background: var(--f1-yellow); }
-        #cursor-ring { 
-            width: 40px; height: 40px; 
-            border: 1px solid var(--f1-teal); 
-            transition: width 0.2s, height 0.2s;
-            mix-blend-mode: difference;
-        }
-
-        /* Typography Override */
-        .font-luxury { font-family: 'Syncopate', sans-serif; }
-        .font-data { font-family: 'Space Mono', monospace; }
-
-        /* === 2. QUANTUM GRID (Background) === */
-        .world-container {
-            position: absolute;
-            inset: 0;
-            perspective: 1000px;
-            overflow: hidden;
-            z-index: 0;
-        }
-
+        /* === OPTIMIZED GRID === */
         .grid-floor {
-            position: absolute;
-            width: 300%;
-            height: 300%;
-            left: -100%;
-            top: -50%;
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
             background-image: 
-                linear-gradient(rgba(0, 240, 255, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
-            background-size: 100px 100px;
-            transform: rotateX(75deg);
-            animation: speed 4s linear infinite;
-            mask-image: radial-gradient(circle at 50% 50%, black 10%, transparent 60%);
+                linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+            background-size: 80px 80px;
+            transform: perspective(500px) rotateX(60deg);
+            animation: grid-scroll 20s linear infinite;
+            z-index: 0;
+            mask-image: radial-gradient(circle, black 0%, transparent 70%);
+            pointer-events: none;
         }
+        @keyframes grid-scroll { from { transform: perspective(500px) rotateX(60deg) translateY(0); } to { transform: perspective(500px) rotateX(60deg) translateY(80px); } }
 
-        @keyframes speed {
-            0% { transform: rotateX(75deg) translateY(0); }
-            100% { transform: rotateX(75deg) translateY(100px); }
+        /* === CIRCUITS (SVG) === */
+        .circuit-layer {
+            position: absolute; inset: 0; pointer-events: none; z-index: 1;
+            opacity: 0.4;
         }
+        .energy-path {
+            fill: none;
+            stroke: var(--neon-teal);
+            stroke-width: 2;
+            stroke-dasharray: 20 1000;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 5px var(--neon-teal));
+            animation: circuit-flow 3s linear infinite;
+        }
+        .energy-path.yellow { stroke: var(--neon-yellow); filter: drop-shadow(0 0 5px var(--neon-yellow)); animation-delay: 1.5s; }
+        @keyframes circuit-flow { to { stroke-dashoffset: -1020; } }
 
-        /* === 3. UI LUXURY GLASS === */
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        /* === HUD MODULES === */
+        .hud-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-left: 3px solid var(--neon-teal);
+            transform: skewX(-10deg);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .hud-panel:hover {
+            border-color: var(--neon-yellow);
+            transform: skewX(-10deg) scale(1.02);
+        }
+        
+        .hud-text { font-family: 'Share Tech Mono', monospace; }
+
+        /* === MAIN CARD === */
+        .glass-card {
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
             position: relative;
-        }
-        
-        /* The "Caution" Striping */
-        .hazard-strip {
-            background: repeating-linear-gradient(
-                45deg,
-                var(--f1-yellow),
-                var(--f1-yellow) 2px,
-                transparent 2px,
-                transparent 8px
-            );
-            opacity: 0.8;
+            transform-style: preserve-3d;
+            will-change: transform;
         }
 
-        /* === 4. GLOW EFFECTS === */
-        .neon-text-teal { text-shadow: 0 0 20px rgba(0, 240, 255, 0.5); }
-        .neon-text-yellow { text-shadow: 0 0 20px rgba(255, 230, 0, 0.5); }
-        
-        .hero-glitch {
+        /* === ANIMATED GLITCH TEXT === */
+        .glitch-wrapper { position: relative; display: inline-block; }
+        .glitch {
             position: relative;
-            color: white;
-            mix-blend-mode: exclusion;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            z-index: 1;
         }
-        
-        /* === 5. UTILITY CLASSES === */
-        .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }
-        
-        /* Loading Overlay */
-        #preloader {
-            position: fixed; inset: 0; background: var(--void); z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--void-bg);
         }
-        .loader-bar { width: 0%; height: 2px; background: var(--f1-teal); }
+        .glitch::before {
+            left: 2px; text-shadow: -1px 0 var(--neon-yellow);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px; text-shadow: -1px 0 var(--neon-teal);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(12px, 9999px, 32px, 0); }
+            20% { clip: rect(64px, 9999px, 10px, 0); }
+            40% { clip: rect(20px, 9999px, 88px, 0); }
+            60% { clip: rect(2px, 9999px, 50px, 0); }
+            80% { clip: rect(44px, 9999px, 12px, 0); }
+            100% { clip: rect(60px, 9999px, 80px, 0); }
+        }
+
+        /* === RPM BARS === */
+        .rpm-segment {
+            flex: 1; height: 100%; background: #1a1a1a;
+            transform: skewX(-20deg); margin: 0 1px;
+            transition: background 0.1s;
+        }
+        .rpm-segment.active-teal { background: var(--neon-teal); box-shadow: 0 0 5px var(--neon-teal); }
+        .rpm-segment.active-yellow { background: var(--neon-yellow); box-shadow: 0 0 5px var(--neon-yellow); }
+
+        /* === BUTTON === */
+        .f1-btn {
+            background: transparent;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .f1-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, var(--neon-yellow), transparent);
+            transition: 0.4s;
+            opacity: 0.4;
+        }
+        .f1-btn:hover::before { left: 100%; }
+        .f1-btn:hover { background: rgba(255, 230, 0, 0.1); border-color: var(--neon-yellow); }
 
     </style>
 </head>
-<body class="antialiased selection:bg-teal-500 selection:text-black">
+<body class="flex items-center justify-center">
 
-    <div id="cursor-dot"></div>
-    <div id="cursor-ring"></div>
+    <div class="grid-floor"></div>
+    
+    <svg class="circuit-layer" width="100%" height="100%" preserveAspectRatio="none">
+        <path d="M0,50 Q200,50 400,200 T1000,400" class="energy-path" />
+        <path d="M1000,50 Q800,50 600,200 T0,400" class="energy-path yellow" />
+        <path d="M0,800 Q200,800 400,600 T1000,400" class="energy-path yellow" />
+        <path d="M1000,900 Q800,900 600,700 T0,500" class="energy-path" />
+    </svg>
 
-    <div id="preloader">
-        <div class="w-64">
-            <div class="flex justify-between text-[10px] text-teal-500 mb-2 font-data">
-                <span>SYSTEM_BOOT</span>
-                <span id="loader-percent">0%</span>
-            </div>
-            <div class="w-full bg-gray-900 h-[2px]">
-                <div class="loader-bar"></div>
-            </div>
-        </div>
-    </div>
+    <div id="spotlight" class="fixed inset-0 pointer-events-none z-10" style="background: radial-gradient(circle 600px at var(--x, 50%) var(--y, 50%), rgba(0, 240, 255, 0.08), transparent 100%); mix-blend-mode: screen;"></div>
 
-    <div class="world-container">
-        <div class="grid-floor"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[var(--void)] via-transparent to-[var(--void)]"></div>
-        <canvas id="noise-canvas" class="absolute inset-0 opacity-20 pointer-events-none"></canvas>
-    </div>
+    <div class="relative z-20 w-full max-w-7xl h-full p-4 flex flex-col justify-between">
 
-    <main class="relative z-10 w-full h-full flex flex-col justify-between p-6 md:p-12">
-
-        <header class="flex justify-between items-start opacity-0" id="header-ui">
-            <div class="flex gap-4">
-                <div class="w-1 h-12 bg-teal-400 hazard-strip"></div>
-                <div>
-                    <h2 class="font-luxury text-xl tracking-widest leading-none">MK.IV</h2>
-                    <p class="text-[10px] text-gray-500 font-data tracking-[0.2em] mt-1">QUANTUM TELEMETRY</p>
+        <header class="flex justify-between items-start pt-6">
+            <div class="hud-panel p-3 w-48 md:w-64 text-xs md:text-sm shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                <div class="flex justify-between border-b border-teal-500/30 pb-1 mb-2 hud-text text-teal-400">
+                    <span>SYS.DIAG</span>
+                    <span class="text-white animate-pulse">● LIVE</span>
+                </div>
+                <div class="flex justify-between hud-text mb-1">
+                    <span class="text-gray-400">CORE_TEMP</span>
+                    <span class="text-white"><span id="temp-val">68</span>°C</span>
+                </div>
+                <div class="flex justify-between hud-text">
+                    <span class="text-gray-400">FLUX_CAP</span>
+                    <span class="text-[var(--neon-yellow)]"><span id="flux-val">98</span>%</span>
                 </div>
             </div>
 
-            <div class="glass-panel px-4 py-2 hidden md:block transform skew-x-[-10deg]">
-                <div class="flex gap-6 text-[10px] font-data transform skew-x-[10deg]">
-                    <div class="flex flex-col items-end">
-                        <span class="text-gray-500">LATENCY</span>
-                        <span class="text-[var(--f1-yellow)]">1.2ms</span>
-                    </div>
-                    <div class="flex flex-col items-end">
-                        <span class="text-gray-500">SERVER</span>
-                        <span class="text-teal-400">VERCEL_EDGE_HK</span>
-                    </div>
-                    <div class="flex flex-col items-end">
-                        <span class="text-gray-500">STATUS</span>
-                        <span class="animate-pulse text-green-400">OPTIMAL</span>
-                    </div>
+            <div class="hud-panel p-3 w-48 md:w-64 text-xs md:text-sm border-l-0 border-r-4 !border-r-[var(--neon-yellow)] shadow-[0_0_15px_rgba(255,230,0,0.1)] hidden md:block">
+                <div class="flex justify-between border-b border-yellow-500/30 pb-1 mb-2 hud-text text-[var(--neon-yellow)]">
+                    <span>LAB_STREAM_01</span>
+                    <span>ENCRYPTED</span>
+                </div>
+                <div class="text-right hud-text">
+                    <div class="text-gray-400 text-[10px] tracking-widest">PROTOCOL ID</div>
+                    <div id="proto-id" class="text-white font-bold">8829-XJ</div>
+                </div>
+                <div class="mt-2 h-1 w-full bg-gray-800 rounded overflow-hidden">
+                    <div class="h-full bg-[var(--neon-yellow)] animate-pulse w-3/4"></div>
                 </div>
             </div>
         </header>
 
-        <section class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl text-center perspective-container">
-            
-            <div class="relative inline-block group cursor-none">
-                <h1 class="font-luxury text-[15vw] leading-[0.8] tracking-tighter mix-blend-screen opacity-0" id="hero-text">
-                    270
-                    <span class="text-[var(--f1-yellow)] text-[4vw] absolute top-0 -right-8 md:-right-16 align-top opacity-80" style="font-style: italic;">km/h</span>
-                </h1>
-
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] border border-teal-500/20 rounded-full scale-0" id="halo-1"></div>
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border border-[var(--f1-yellow)] opacity-10 rounded-full scale-0" style="border-style: dashed;" id="halo-2"></div>
-            </div>
-
-            <div class="mt-8 flex flex-col items-center opacity-0" id="hero-sub">
-                <p class="font-data text-teal-300 text-xs md:text-sm tracking-[0.5em] uppercase mb-6">
-                    Aerodynamics <span class="text-gray-600 px-2">//</span> Quantum Computing
-                </p>
+        <main class="flex-grow flex items-center justify-center perspective-container">
+            <div class="glass-card p-8 md:p-12 w-full max-w-2xl text-center group">
                 
-                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" 
-                   class="group relative inline-flex items-center gap-3 px-8 py-4 bg-transparent overflow-hidden border border-teal-500/30 hover:border-teal-400 transition-colors duration-300">
-                    
-                    <div class="absolute inset-0 bg-teal-500/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></div>
-                    
-                    <span class="absolute top-0 left-0 w-2 h-2 border-t border-l border-teal-400"></span>
-                    <span class="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-teal-400"></span>
+                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[var(--neon-teal)]"></div>
+                <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[var(--neon-teal)]"></div>
+                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[var(--neon-teal)]"></div>
+                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[var(--neon-teal)]"></div>
 
-                    <span class="relative z-10 font-luxury text-sm font-bold tracking-widest uppercase text-white group-hover:text-teal-200">
-                        Initiate Sequence
-                    </span>
-                    <i data-lucide="arrow-right" class="relative z-10 w-4 h-4 text-[var(--f1-yellow)] group-hover:translate-x-1 transition-transform"></i>
+                <div class="glitch-wrapper mb-2">
+                    <h1 class="glitch text-8xl md:text-[10rem] leading-none text-white tracking-tighter" data-text="270">270</h1>
+                </div>
+                
+                <div class="flex items-center justify-center gap-4 text-2xl md:text-4xl italic font-bold text-[var(--neon-teal)] mb-8 font-['Orbitron']">
+                    <span class="h-px w-12 bg-[var(--neon-teal)]"></span>
+                    KM/H
+                    <span class="h-px w-12 bg-[var(--neon-teal)]"></span>
+                </div>
+
+                <div class="h-4 w-full bg-black/50 border border-white/10 rounded mb-8 flex px-1 py-0.5" id="rpm-container">
+                    </div>
+
+                <div class="flex justify-between items-center text-[10px] md:text-xs font-['Share_Tech_Mono'] text-gray-400 tracking-[0.2em] uppercase border-t border-white/10 pt-4 mb-8">
+                    <span>Aero_Dynamics: <span class="text-white">Active</span></span>
+                    <span>Launch: <span class="text-[var(--neon-yellow)]">2026</span></span>
+                </div>
+
+                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" 
+                   class="f1-btn inline-flex items-center gap-3 px-10 py-4 border border-[var(--neon-yellow)] text-[var(--neon-yellow)] font-bold tracking-widest uppercase text-sm group">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                    <span>Confirm Attendance</span>
                 </a>
             </div>
+        </main>
 
-        </section>
-
-        <footer class="flex justify-between items-end opacity-0" id="footer-ui">
-            
-            <div class="hidden md:block w-64">
-                <div class="flex justify-between text-[10px] font-data text-gray-500 mb-1">
-                    <span>ENGINE_LOAD</span>
-                    <span id="rpm-text">0%</span>
-                </div>
-                <div class="flex gap-[2px] h-4 items-end">
-                    <div class="rpm-bars flex gap-[2px] h-full w-full items-end"></div>
-                </div>
-            </div>
-
-            <div class="md:hidden text-[10px] text-gray-600 font-data">
-                SCROLL TO ENGAGE
-            </div>
-
-            <div class="text-right">
-                <div class="flex flex-col gap-1 text-[10px] font-data text-gray-400">
-                    <p>X: <span id="coord-x" class="text-teal-500">00.00</span></p>
-                    <p>Y: <span id="coord-y" class="text-teal-500">00.00</span></p>
-                    <p class="text-[var(--f1-yellow)] mt-2">SECURE_CONNECTION</p>
-                </div>
+        <footer class="pb-6 flex justify-center">
+            <div class="flex gap-1 items-end h-8">
+                <div class="w-1 bg-[var(--neon-teal)] h-3 animate-pulse"></div>
+                <div class="w-1 bg-[var(--neon-teal)] h-5 animate-pulse" style="animation-delay: 0.1s"></div>
+                <div class="w-1 bg-[var(--neon-teal)] h-8 animate-pulse" style="animation-delay: 0.2s"></div>
+                <div class="w-1 bg-[var(--neon-teal)] h-4 animate-pulse" style="animation-delay: 0.3s"></div>
+                <span class="ml-2 text-[10px] text-[var(--neon-teal)] font-['Share_Tech_Mono'] self-center">SYSTEM OPTIMAL</span>
             </div>
         </footer>
 
-    </main>
+    </div>
 
     <script>
-        /* === 1. INITIALIZATION & LOGIC === */
-        
-        // Icons
+        // 1. Initialize Icons
         lucide.createIcons();
 
-        // Cursor Logic
-        const cursorDot = document.getElementById('cursor-dot');
-        const cursorRing = document.getElementById('cursor-ring');
-        
+        // 2. Parallax & Spotlight Logic (Optimized)
+        const root = document.body;
+        const spotlight = document.getElementById('spotlight');
+        const card = document.querySelector('.glass-card');
+
         document.addEventListener('mousemove', (e) => {
-            // GSAP is smoother than standard CSS for mouse following
-            gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.1 });
-            gsap.to(cursorRing, { x: e.clientX, y: e.clientY, duration: 0.3, ease: "power2.out" });
+            const x = e.clientX;
+            const y = e.clientY;
             
-            // Update Coordinates
-            document.getElementById('coord-x').innerText = (e.clientX / window.innerWidth * 100).toFixed(2);
-            document.getElementById('coord-y').innerText = (e.clientY / window.innerHeight * 100).toFixed(2);
-            
-            // Parallax Effect on Hero
-            const moveX = (e.clientX - window.innerWidth / 2) * 0.02;
-            const moveY = (e.clientY - window.innerHeight / 2) * 0.02;
-            gsap.to('.perspective-container', { 
-                rotationY: moveX, 
-                rotationX: -moveY, 
-                ease: "power1.out", 
-                duration: 1 
+            // Spotlight moves with cursor
+            spotlight.style.setProperty('--x', `${x}px`);
+            spotlight.style.setProperty('--y', `${y}px`);
+
+            // 3D Tilt Effect on Card (GSAP for smoothness)
+            const xPct = (x / window.innerWidth - 0.5) * 20; // -10 to 10 deg
+            const yPct = (y / window.innerHeight - 0.5) * -20; 
+
+            gsap.to(card, {
+                rotationY: xPct,
+                rotationX: yPct,
+                duration: 0.5,
+                ease: "power2.out"
             });
         });
 
-        /* === 2. RPM GAUGE GENERATOR === */
-        const rpmContainer = document.querySelector('.rpm-bars');
-        for(let i=0; i<30; i++) {
-            const bar = document.createElement('div');
-            bar.className = `w-1 bg-teal-900/50 transition-all duration-75`;
-            bar.style.height = '20%';
-            bar.id = `bar-${i}`;
-            rpmContainer.appendChild(bar);
+        // 3. Dynamic RPM Bar Generator
+        const rpmContainer = document.getElementById('rpm-container');
+        const totalSegments = 40;
+        
+        // Create segments
+        for(let i=0; i<totalSegments; i++) {
+            let div = document.createElement('div');
+            div.className = 'rpm-segment';
+            rpmContainer.appendChild(div);
         }
 
-        // RPM Animation Loop
+        const segments = document.querySelectorAll('.rpm-segment');
+
+        // 4. Central Game Loop (Single Interval for ALL Data)
         setInterval(() => {
-            const activeBars = Math.floor(Math.random() * 20) + 5; // Random engine noise
-            const rpmPercent = Math.floor((activeBars / 30) * 100);
-            document.getElementById('rpm-text').innerText = rpmPercent + "%";
-            
-            for(let i=0; i<30; i++) {
-                const bar = document.getElementById(`bar-${i}`);
-                if(i < activeBars) {
-                    // Color logic: Teal -> Yellow -> Red (if very high)
-                    if (i > 24) bar.style.backgroundColor = 'var(--f1-yellow)';
-                    else bar.style.backgroundColor = 'var(--f1-teal)';
-                    
-                    bar.style.height = Math.random() > 0.5 ? '80%' : '100%';
-                    bar.style.opacity = '1';
-                } else {
-                    bar.style.backgroundColor = '#0f172a';
-                    bar.style.height = '20%';
-                    bar.style.opacity = '0.3';
+            // Update RPM
+            const revs = Math.random() * 100; // 0 to 100%
+            const activeCount = Math.floor((revs / 100) * totalSegments);
+
+            segments.forEach((seg, index) => {
+                seg.className = 'rpm-segment'; // Reset
+                if (index < activeCount) {
+                    if (index > totalSegments * 0.7) {
+                        seg.classList.add('active-yellow');
+                    } else {
+                        seg.classList.add('active-teal');
+                    }
                 }
+            });
+
+            // Update Random Text Numbers
+            if(Math.random() > 0.5) {
+                document.getElementById('temp-val').innerText = Math.floor(Math.random() * (90 - 60) + 60);
+                document.getElementById('flux-val').innerText = Math.floor(Math.random() * (100 - 85) + 85);
             }
-        }, 100);
 
-        /* === 3. INTRO ANIMATION SEQUENCE (The €100k Reveal) === */
-        
-        // Simulating Asset Load
-        let loadProgress = 0;
-        const loaderInterval = setInterval(() => {
-            loadProgress += Math.floor(Math.random() * 10) + 5;
-            if(loadProgress > 100) loadProgress = 100;
-            
-            document.querySelector('.loader-bar').style.width = loadProgress + '%';
-            document.getElementById('loader-percent').innerText = loadProgress + '%';
-
-            if(loadProgress === 100) {
-                clearInterval(loaderInterval);
-                runIntro();
+            // Update Protocol ID occasionally
+            if(Math.random() > 0.9) {
+                document.getElementById('proto-id').innerText = Math.floor(Math.random() * 9000) + "-XJ";
             }
-        }, 150);
 
-        function runIntro() {
-            const tl = gsap.timeline();
-
-            // 1. Remove Preloader
-            tl.to('#preloader', { yPercent: -100, duration: 1, ease: "power4.inOut" })
-            
-            // 2. Reveal Hero Text (Split text effect simulation)
-            .to('#hero-text', { opacity: 1, duration: 1, clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)" })
-            
-            // 3. Expand Halos
-            .to('#halo-1', { scale: 1, rotation: 360, duration: 2, ease: "expo.out" }, "-=0.5")
-            .to('#halo-2', { scale: 1, rotation: -180, duration: 2.5, ease: "expo.out" }, "-=1.8")
-            
-            // 4. Reveal UI Elements
-            .to(['#header-ui', '#footer-ui', '#hero-sub'], { opacity: 1, y: 0, stagger: 0.2, duration: 0.8 });
-        }
-
-        /* === 4. CANVAS NOISE (Texture) === */
-        const canvas = document.getElementById('noise-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        };
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        function drawNoise() {
-            const w = canvas.width;
-            const h = canvas.height;
-            const idata = ctx.createImageData(w, h);
-            const buffer32 = new Uint32Array(idata.data.buffer);
-            const len = buffer32.length;
-
-            for (let i = 0; i < len; i++) {
-                if (Math.random() < 0.05) {
-                    buffer32[i] = 0xffffffff; // White noise
-                }
-            }
-            ctx.putImageData(idata, 0, 0);
-            requestAnimationFrame(drawNoise);
-        }
-        // Lower frame rate for noise to save battery
-        setInterval(() => { requestAnimationFrame(drawNoise); }, 100);
+        }, 100); // 10 FPS update for data (enough for "tech" feel, saves CPU)
 
     </script>
 </body>
