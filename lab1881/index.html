@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>270 KM/H - Launch Sequence</title>
+    <title>270 KM/H - Teal Quantum Launch</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
@@ -12,331 +12,293 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* === 1. CORE SETUP - QUANTUM THEME === */
+        /* === 1. CORE CONFIGURATION === */
         :root {
-            /* Updated palette based on the reference image (Deep Navy, Blue, Purple) */
-            --quantum-primary: #3b82f6; /* Electric Blue */
-            --quantum-secondary: #8b5cf6; /* Violet */
-            --quantum-accent: #06b6d4; /* Cyan */
-            --bg-deep: #020617; /* Deep Navy/Black */
+            --primary: #14b8a6;   /* Teal 500 */
+            --accent: #22d3ee;    /* Cyan 400 */
+            --glow: #0d9488;      /* Teal 600 */
+            --bg-dark: #020609;   /* Almost Black/Teal */
+            --glass-border: rgba(20, 184, 166, 0.3);
+            --glass-surface: rgba(4, 47, 46, 0.4);
         }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-deep);
-            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #020617 60%);
+            background-color: var(--bg-dark);
+            /* Deep Radial Gradient simulating deep ocean/space */
+            background-image: radial-gradient(circle at 50% 0%, #112a28 0%, #020609 70%);
             overflow: hidden; 
-        }
-
-        #alien-f1-root {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
             font-family: 'Share Tech Mono', monospace;
-            color: var(--quantum-accent);
-            cursor: crosshair;
+            color: var(--accent);
         }
 
-        /* === 2. BACKGROUND LAYERS === */
-        
-        #quantum-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            opacity: 0.8;
-            mix-blend-mode: screen;
+        /* Noise Texture for Cinematic Feel */
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 99; opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        /* Updated Grid to be subtler and blue */
+        #root-container {
+            position: relative; width: 100vw; height: 100vh;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* === 2. BACKGROUND & PARTICLES === */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; mix-blend-mode: screen; opacity: 0.8;
+        }
+
+        /* 3D Floor Grid */
         .cyber-grid {
-            position: fixed;
-            width: 200vw;
-            height: 200vh;
-            left: -50%;
-            top: -50%;
+            position: fixed; width: 300vw; height: 200vh; left: -100%; top: -20%;
             background-image:
-                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
-            background-size: 80px 80px;
-            transform: perspective(500px) rotateX(60deg);
-            animation: gridMove 20s linear infinite;
-            opacity: 0.15;
-            z-index: 0;
-            pointer-events: none;
-            mask-image: radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+                linear-gradient(rgba(20, 184, 166, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 184, 166, 0.15) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: perspective(600px) rotateX(75deg);
+            animation: gridFlow 15s linear infinite;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 40%, transparent 90%);
+            z-index: 0; pointer-events: none;
         }
 
-        @keyframes gridMove {
-            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
-            100% { transform: perspective(500px) rotateX(60deg) translateY(80px); }
+        @keyframes gridFlow {
+            0% { transform: perspective(600px) rotateX(75deg) translateY(0); }
+            100% { transform: perspective(600px) rotateX(75deg) translateY(60px); }
         }
 
-        /* === 3. FLUID DATA LINES (Formerly Alien Circuit) === */
-        .circuit-container {
-            position: fixed;
-            inset: 0;
-            z-index: 2;
-            pointer-events: none;
-            width: 100%;
-            height: 100%;
+        /* Scanner Line */
+        .scanner-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            box-shadow: 0 0 30px var(--accent);
+            opacity: 0.3; z-index: 2;
+            animation: scan 8s ease-in-out infinite;
+        }
+        @keyframes scan {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { top: 110%; opacity: 0; }
         }
 
-        .alien-path-bg { fill: none; stroke: rgba(139, 92, 246, 0.1); stroke-width: 1; }
-        .alien-energy-flow {
-            fill: none; stroke: #3b82f6; stroke-width: 2; stroke-linecap: round;
-            stroke-dasharray: 50 800; filter: drop-shadow(0 0 10px #8b5cf6);
-            animation: alienPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        /* === 3. ADVANCED GLASSMORPHISM (THE CORE REQUEST) === */
+        .ultra-glass {
+            /* The base glass */
+            background: rgba(10, 20, 25, 0.3); /* Very dark teal tint */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            
+            /* The "Ice" Border */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+            
+            /* Depth and Glow */
+            box-shadow: 
+                0 20px 50px rgba(0,0,0,0.5),              /* Drop shadow */
+                inset 0 0 30px rgba(20, 184, 166, 0.05),   /* Inner teal glow */
+                0 0 0 1px rgba(20, 184, 166, 0.1);         /* Outer accent ring */
+                
+            border-radius: 24px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
         }
-        .flow-delay-1 { animation-delay: 0s; stroke: #06b6d4; }
-        .flow-delay-2 { animation-delay: 0.5s; stroke: #8b5cf6; }
-        .flow-delay-3 { animation-delay: 1.2s; stroke: #3b82f6; }
-        .flow-delay-4 { animation-delay: 0.8s; stroke: #a855f7; }
-        @keyframes alienPulse { to { stroke-dashoffset: -850; } }
 
-        /* Spotlight - Soft Blue/Purple Glow */
-        #spotlight {
-            background: radial-gradient(circle 800px at var(--x, 50%) var(--y, 50%), rgba(59, 130, 246, 0.15), transparent 100%);
-            position: fixed; inset: 0; z-index: 5; pointer-events: none; mix-blend-mode: screen;
+        /* Internal sheen reflection */
+        .ultra-glass::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(125deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.02) 100%);
+            border-radius: 24px; pointer-events: none; z-index: 1;
         }
 
-        /* === 4. QUANTUM UI ELEMENTS === */
+        /* Decorative Corners */
+        .corner-accent {
+            position: absolute; width: 12px; height: 12px;
+            border-color: var(--accent); border-style: solid;
+            transition: all 0.3s ease; opacity: 0.7;
+        }
+        .ca-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; border-radius: 6px 0 0 0; }
+        .ca-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; border-radius: 0 6px 0 0; }
+        .ca-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; border-radius: 0 0 0 6px; }
+        .ca-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; border-radius: 0 0 6px 0; }
+
+        .ultra-glass:hover .corner-accent { 
+            width: 100%; height: 100%; border-radius: 24px; opacity: 0.2; 
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        /* === 4. TYPOGRAPHY & ELEMENTS === */
         .font-sporty { font-family: 'Orbitron', sans-serif; }
         .font-tech { font-family: 'Rajdhani', sans-serif; }
 
-        /* Glassmorphism Card Style */
-        .aug-card {
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 
-                0 0 80px rgba(59, 130, 246, 0.15), 
-                inset 0 0 30px rgba(59, 130, 246, 0.05);
-            /* Rounded corners for the modern quantum look */
-            border-radius: 30px; 
-            position: relative;
-            transition: transform 0.1s ease-out;
-            overflow: hidden;
-        }
-        
-        /* Subtle internal shine */
-        .aug-card::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
-        /* Tech Corners - Softened to glowing dots/accents */
-        .tech-bracket {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%;
-            background: var(--quantum-primary);
-            box-shadow: 0 0 10px var(--quantum-primary);
-            transition: all 0.3s ease; opacity: 0.6;
-        }
-        .tb-tl { top: 15px; left: 15px; }
-        .tb-tr { top: 15px; right: 15px; }
-        .tb-bl { bottom: 15px; left: 15px; }
-        .tb-br { bottom: 15px; right: 15px; }
-        
-        .aug-card:hover .tech-bracket { box-shadow: 0 0 20px var(--quantum-secondary); background: var(--quantum-secondary); }
-
-        /* Gradient Text */
-        .glitch {
-            position: relative; 
-            background: linear-gradient(135deg, #fff 0%, #3b82f6 50%, #a855f7 100%);
+        .glitch-text {
+            background: linear-gradient(to bottom, #fff 0%, #2dd4bf 60%, #115e59 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Subtler glow for Quantum theme */
-            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
-            animation: pulse-glow 3s infinite alternate;
-        }
-        
-        @keyframes pulse-glow {
-            0% { filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.3)); }
-            100% { filter: drop-shadow(0 0 25px rgba(139, 92, 246, 0.6)); }
+            filter: drop-shadow(0 0 20px rgba(45, 212, 191, 0.4));
+            position: relative;
         }
 
-        /* CONTINUOUS LOOP BAR */
-        .rpm-bar-container { 
-            background: rgba(0,0,0,0.3); 
-            border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 99px; /* Pill shape */
+        .hologram-btn {
+            background: rgba(20, 184, 166, 0.1);
+            border: 1px solid var(--primary);
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: 0.4s;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 10px rgba(20, 184, 166, 0.1);
         }
-        
-        .rpm-fill {
-            height: 100%;
-            background: linear-gradient(90deg, transparent, #3b82f6, #a855f7);
-            width: 0%;
-            box-shadow: 0 0 20px #3b82f6;
-            animation: continuous-loop 2s infinite linear;
+        .hologram-btn:hover {
+            background: var(--primary);
+            box-shadow: 0 0 30px var(--primary);
+            text-shadow: 0 0 5px black;
+            color: black;
+            font-weight: 800;
+        }
+
+        /* Progress Bar */
+        .loading-pill {
+            background: rgba(0,0,0,0.5); border-radius: 99px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .loading-fill {
+            background: linear-gradient(90deg, transparent, #2dd4bf, #fff);
+            height: 100%; width: 50%;
             border-radius: 99px;
+            box-shadow: 0 0 15px #2dd4bf;
+            animation: loadLoop 2.5s infinite ease-in-out;
+        }
+        @keyframes loadLoop {
+            0% { width: 0%; opacity: 0; transform: translateX(0); }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { width: 100%; opacity: 0; transform: translateX(20px); }
         }
 
-        @keyframes continuous-loop {
-            0% { width: 0%; opacity: 0.8; }
-            50% { opacity: 1; }
-            90% { width: 100%; opacity: 1; }
-            100% { width: 100%; opacity: 0; }
-        }
-
-        /* Buttons */
-        .cyber-btn {
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            border-radius: 99px;
-            position: relative; overflow: hidden; transition: all 0.3s;
-        }
-        .cyber-btn::before {
-            content:''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
-            transition: 0.5s;
-        }
-        .cyber-btn:hover::before { left: 100%; }
-        .cyber-btn:hover { 
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)); 
-            border-color: #a855f7;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3); 
-            letter-spacing: 0.2em; 
-        }
-
-        /* HUD Modules - Glassy floaters */
-        .hud-module {
-            background: rgba(15, 23, 42, 0.6);
-            border-left: 2px solid #3b82f6;
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
+        /* Floating HUD Widgets */
+        .hud-widget {
+            background: rgba(4, 47, 46, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+            border-left: 3px solid var(--accent);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .hud-line { height: 1px; width: 20px; background: #3b82f6; display: inline-block; vertical-align: middle; margin-right: 5px; opacity: 0.5; }
+
     </style>
 </head>
 
 <body>
+    
+    <div class="noise-overlay"></div>
+    <div class="scanner-line"></div>
+    <div class="cyber-grid"></div>
+    <canvas id="particle-canvas"></canvas>
 
-    <div id="alien-f1-root">
-
-        <div class="cyber-grid"></div>
-
-        <canvas id="quantum-canvas"></canvas>
-
-        <div class="circuit-container">
-            <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-                <defs>
-                    <path id="path-tl" d="M0,0 L250,250 L350,250 L450,450" />
-                    <path id="path-tr" d="M1000,0 L750,250 L650,250 L550,450" />
-                    <path id="path-bl" d="M0,1000 L250,750 L350,750 L450,550" />
-                    <path id="path-br" d="M1000,1000 L750,750 L650,750 L550,550" />
-                </defs>
-
-                <g class="alien-path-bg">
-                    <use href="#path-tl"/><use href="#path-tr"/><use href="#path-bl"/><use href="#path-br"/>
-                </g>
-
-                <g>
-                    <use href="#path-tl" class="alien-energy-flow flow-delay-1"/>
-                    <use href="#path-tr" class="alien-energy-flow flow-delay-2"/>
-                    <use href="#path-bl" class="alien-energy-flow flow-delay-3"/>
-                    <use href="#path-br" class="alien-energy-flow flow-delay-4"/>
-                </g>
-            </svg>
+    <div id="root-container">
+        
+        <div class="absolute top-8 left-8 hidden md:block transform transition hover:scale-105 duration-300">
+            <div class="hud-widget p-4 w-64 skew-x-[-10deg]">
+                <div class="skew-x-[10deg]">
+                    <div class="flex justify-between border-b border-teal-500/30 pb-2 mb-2">
+                        <span class="text-[10px] text-teal-200 tracking-[0.2em]">TELEMETRY</span>
+                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_red]"></span>
+                    </div>
+                    <div class="space-y-1 font-tech text-teal-100">
+                        <div class="flex justify-between">
+                            <span class="text-teal-500 text-xs">CORE_TEMP</span>
+                            <span class="font-bold"><span id="temp">65</span>°C</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-teal-500 text-xs">FLUID_PSI</span>
+                            <span class="font-bold"><span id="psi">240</span></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-teal-500 text-xs">LATENCY</span>
+                            <span class="font-bold text-teal-300">12ms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="h-20 w-[1px] bg-gradient-to-b from-teal-500 to-transparent absolute left-0 bottom-[-80px]"></div>
         </div>
 
-        <div id="spotlight"></div>
-
-        <div class="relative z-30 min-h-screen w-full flex flex-col items-center justify-center p-4">
-
-            <div class="absolute top-4 left-4 z-40 origin-top-left transform scale-50 md:scale-100 md:top-8 md:left-8">
-                <div class="hud-module p-3 w-64 text-[10px] text-cyan-400 font-tech tracking-[0.15em] uppercase transform -skew-x-6 border-l-2 border-cyan-500">
-                    <div class="flex flex-col gap-1 not-italic skew-x-6">
-                        <div class="border-b border-cyan-500/30 pb-1 mb-1 flex justify-between">
-                            <span>VEHICLE.TELEMETRY</span><span class="animate-pulse text-white">● REC</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>MOTOR_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span>ENERGY_FLOW</span><span class="text-blue-300"><span id="t2">15</span> kW</span>
-                        </div>
-                        <div class="mt-2 text-xs text-blue-400 border-t border-cyan-500/30 pt-1">
-                            <span class="mr-2">></span><span id="msg">SYSTEM CHECK...</span>
+        <div class="absolute top-8 right-8 hidden md:block transform transition hover:scale-105 duration-300">
+            <div class="hud-widget p-4 w-64 skew-x-[10deg] border-l-0 border-r-4 border-r-teal-400">
+                <div class="skew-x-[-10deg] text-right">
+                    <div class="border-b border-teal-500/30 pb-2 mb-2">
+                        <span class="text-[10px] text-teal-200 tracking-[0.2em]">NETWORK</span>
+                    </div>
+                    <div class="font-mono text-[10px] text-teal-400 space-y-1">
+                        <div>HASH: <span class="text-white">0x7F...AE2</span></div>
+                        <div>NODE: <span class="text-teal-200 animate-pulse">CONNECTED</span></div>
+                        <div class="mt-2 text-right text-xs text-white bg-teal-900/50 inline-block px-2 py-1 rounded">
+                            SECURE_LINK_EST
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="absolute top-4 right-4 z-40 origin-top-right transform scale-50 md:scale-100 md:top-8 md:right-8">
-                <div class="hud-module p-3 w-56 text-[10px] text-indigo-400 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 border-indigo-500 transform -skew-x-6">
-                    <div class="flex flex-col gap-1 skew-x-6">
-                        <div class="border-b border-indigo-500/30 pb-1 mb-1 text-indigo-300 text-right">PERFORMANCE_MONITOR</div>
-                        <div class="text-xs text-white mb-1 text-right">SESSION_ID: <span id="proto" class="text-purple-300 font-mono">76266262</span></div>
-                        <div class="flex items-center justify-end gap-2">
-                            <span id="status" class="text-blue-400">CONNECTING...</span>
-                            <div class="w-1.5 h-1.5 bg-blue-400 animate-ping rounded-full"></div>
-                        </div>
-                        <div class="mt-2 pt-1 border-t border-indigo-500/30 flex justify-between items-center">
-                            <span class="text-gray-400">BATTERY INTEGRITY:</span>
-                            <span id="hlth" class="text-cyan-400 font-bold font-sporty text-lg">95.0%</span>
-                        </div>
+        <div class="ultra-glass p-10 md:p-16 w-full max-w-3xl flex flex-col items-center justify-center text-center z-10 m-4">
+            
+            <div class="corner-accent ca-tl"></div>
+            <div class="corner-accent ca-tr"></div>
+            <div class="corner-accent ca-bl"></div>
+            <div class="corner-accent ca-br"></div>
+
+            <div class="mb-2 flex items-center gap-2 opacity-80">
+                <i data-lucide="crosshair" class="w-4 h-4 text-teal-500"></i>
+                <span class="text-[10px] tracking-[0.4em] text-teal-200 font-bold uppercase">Project Turquoise</span>
+                <i data-lucide="crosshair" class="w-4 h-4 text-teal-500"></i>
+            </div>
+
+            <div class="relative mb-6 group cursor-default">
+                <h1 class="text-8xl md:text-[10rem] leading-[0.85] font-sporty italic font-black glitch-text transform skew-x-[-10deg] transition duration-500 group-hover:skew-x-0">
+                    270
+                </h1>
+                <div class="absolute -right-4 top-2 md:top-8 bg-teal-500 text-black font-bold text-[10px] px-1 py-0.5 rounded transform skew-x-[-10deg]">
+                    MK.V
+                </div>
+                <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-teal-500/10 opacity-0 group-hover:opacity-100 transition duration-500 blur-xl pointer-events-none"></div>
+            </div>
+
+            <h2 class="text-2xl md:text-3xl font-sporty text-white/80 italic tracking-widest mb-10">
+                <span class="text-teal-500">///</span> KILOMETERS PER HOUR
+            </h2>
+
+            <div class="w-full max-w-md h-2 loading-pill mb-8 overflow-hidden relative">
+                <div class="absolute inset-0 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzhhYWGMYAEYB8RmROaABADeOQ8CXl/xfgAAAABJRU5ErkJggg==')] opacity-20"></div>
+                <div class="loading-fill"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 w-full max-w-lg mb-10">
+                <div class="bg-teal-950/30 border border-teal-500/20 p-3 rounded backdrop-blur-sm hover:bg-teal-900/40 transition">
+                    <div class="text-[10px] text-teal-400 uppercase tracking-widest mb-1">Status</div>
+                    <div class="text-white font-tech text-lg flex items-center justify-center gap-2">
+                        <div class="w-2 h-2 bg-teal-400 rounded-full animate-ping"></div>
+                        ONLINE
                     </div>
+                </div>
+                <div class="bg-teal-950/30 border border-teal-500/20 p-3 rounded backdrop-blur-sm hover:bg-teal-900/40 transition">
+                    <div class="text-[10px] text-teal-400 uppercase tracking-widest mb-1">Aero Drag</div>
+                    <div class="text-white font-tech text-lg">0.21 Cd</div>
                 </div>
             </div>
 
-            <div class="aug-card p-8 md:p-16 max-w-2xl w-full group collision-target mt-20 md:mt-0">
-                <div class="tech-bracket tb-tl"></div>
-                <div class="tech-bracket tb-tr"></div>
-                <div class="tech-bracket tb-bl"></div>
-                <div class="tech-bracket tb-br"></div>
+            <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="hologram-btn px-12 py-4 rounded-full font-sporty text-xs font-bold flex items-center gap-3 group">
+                <i data-lucide="linkedin" class="w-5 h-5 group-hover:text-black transition"></i>
+                <span>Initialize Sequence</span>
+                <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+            </a>
 
-                <div class="text-center relative z-10">
-                    
-                    <div class="inline-block relative mb-4 collision-target">
-                        <h1 class="font-sporty text-7xl md:text-9xl leading-none italic pr-8 glitch">270</h1>
-                        <div class="absolute -right-10 top-0 flex flex-col items-center gap-1">
-                            <span class="text-[10px] bg-blue-600 rounded text-white px-1 font-mono font-bold">MK.IV</span>
-                            <span class="w-px h-12 bg-blue-500/50"></span>
-                        </div>
-                    </div>
-
-                    <div class="text-2xl font-sporty text-white italic -skew-x-12 mb-8 opacity-90 flex justify-center items-center gap-4">
-                        <span class="hud-line"></span> KM/H <span class="hud-line"></span>
-                    </div>
-
-                    <div class="h-4 rpm-bar-container rounded-full mb-10 overflow-hidden collision-target">
-                        <div class="h-full rpm-fill"></div>
-                    </div>
-
-                    <div class="border-y border-white/10 py-6 mb-10 bg-indigo-950/30 backdrop-blur-md rounded-lg">
-                        <div class="flex items-center justify-center gap-3 mb-2">
-                            <i data-lucide="zap" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
-                            <p class="text-blue-200 text-xs tracking-[0.3em] font-tech uppercase">Launch Sequence: <span class="text-white font-bold text-sm">2026</span></p>
-                            <i data-lucide="zap" class="w-4 h-4 text-cyan-400 animate-pulse"></i>
-                        </div>
-                        <p class="text-indigo-300/70 text-[10px] font-tech tracking-widest uppercase">Aerodynamics Beyond Physics</p>
-                    </div>
-
-                    <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="collision-target inline-flex items-center px-10 py-4 cyber-btn text-white font-sporty text-xs tracking-widest uppercase group">
-                        <i data-lucide="linkedin" class="w-4 h-4 mr-3 group-hover:text-cyan-300"></i>
-                        <span>Confirm Attendance</span>
-                    </a>
-
-                </div>
-            </div>
-
-            <div class="flex flex-col items-center gap-1 opacity-80 mt-8 md:absolute md:bottom-8">
-                <div class="flex items-end gap-1 mb-1">
-                    <div class="w-1 h-2 bg-blue-500 animate-pulse rounded-full"></div>
-                    <div class="w-1 h-3 bg-indigo-500 animate-pulse rounded-full" style="animation-delay: 0.1s"></div>
-                    <div class="w-1 h-4 bg-purple-500 animate-pulse rounded-full" style="animation-delay: 0.2s"></div>
-                    <div class="w-1 h-3 bg-indigo-500 animate-pulse rounded-full" style="animation-delay: 0.3s"></div>
-                    <div class="w-1 h-2 bg-blue-500 animate-pulse rounded-full" style="animation-delay: 0.4s"></div>
-                </div>
-                <div class="text-[9px] text-cyan-400 tracking-[0.5em] uppercase font-bold text-shadow-glow">Compiling... 49%</div>
+            <div class="mt-8 text-[9px] text-teal-600 font-mono tracking-widest opacity-60">
+                SYS.ID: <span id="sys-id">884-29-X</span> // ALL SYSTEMS GO
             </div>
 
         </div>
@@ -344,12 +306,12 @@
     </div>
 
     <script>
-        // --- 1. QUANTUM PARTICLES (UPDATED COLORS) ---
-        const canvas = document.getElementById('quantum-canvas');
+        // --- 1. TEAL QUANTUM PARTICLES ---
+        const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         
-        function resizeCanvas() {
+        const resizeCanvas = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
@@ -358,124 +320,108 @@
 
         class Particle {
             constructor() {
+                this.reset();
+            }
+
+            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 1.5; 
-                this.speedY = (Math.random() - 0.5) * 1.5; 
-                this.life = Math.random() * 100; 
-                // Randomly assign Blue or Purple tint
-                this.hue = Math.random() > 0.5 ? 210 : 270; // Blue or Purple
+                this.size = Math.random() * 2;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.life = Math.random() * 100;
+                this.opacity = Math.random() * 0.5;
             }
 
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
-                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
                 this.life++;
+
+                if (this.life > 200 || this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
             }
 
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                const alpha = (Math.sin(this.life * 0.05) + 1) / 2 * 0.5 + 0.2; 
-                // Updated Color Logic to HSLA
-                ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${alpha})`;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = `hsla(${this.hue}, 100%, 50%, 0.8)`;
+                // Teal/Cyan HSL range (160-190)
+                ctx.fillStyle = `hsla(170, 100%, 70%, ${this.opacity})`;
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = `hsla(170, 100%, 50%, 0.5)`;
                 ctx.fill();
             }
         }
 
         function initParticles() {
             particles = [];
-            const numberOfParticles = Math.floor(window.innerWidth / 15);
-            for (let i = 0; i < numberOfParticles; i++) {
-                particles.push(new Particle());
-            }
+            for (let i = 0; i < 70; i++) particles.push(new Particle());
         }
 
-        function animateParticles() {
+        function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => {
                 p.update();
                 p.draw();
             });
-            requestAnimationFrame(animateParticles);
+            
+            // Draw connecting lines for nearby particles
+            particles.forEach((a, index) => {
+                particles.slice(index + 1).forEach(b => {
+                    const dx = a.x - b.x;
+                    const dy = a.y - b.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(20, 184, 166, ${0.1 - dist/1000})`; // Teal lines
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(animate);
         }
 
         initParticles();
-        animateParticles();
+        animate();
 
+        // --- 2. 3D CARD PARALLAX ---
+        const container = document.getElementById('root-container');
+        const card = document.querySelector('.ultra-glass');
 
-        // --- 2. HUD DATA UPDATES (UNCHANGED LOGIC) ---
-        
-        // Random Motor Temp
-        setInterval(() => {
-            const el = document.getElementById('t1');
-            if(el) el.innerText = Math.floor(Math.random()*(90-50)+50);
-        }, 1200);
-
-        // Random Energy Flow (kW)
-        setInterval(() => {
-            const el = document.getElementById('t2');
-            if(el) el.innerText = Math.floor(Math.random()*(250-10)+10);
-        }, 150);
-
-        // System Messages
-        const msgs = ["SYSTEM_CHECK: OK", "TRACTION_CTRL: ON", "TORQUE_VECTOR: ACTIVE", "AERO_DYNAMICS: OPTIMAL", "TIRE_PRESSURE: STABLE"];
-        let mi = 0;
-        setInterval(() => {
-            const el = document.getElementById('msg');
-            if(el) {
-                el.innerText = msgs[mi];
-                mi = (mi + 1) % msgs.length;
-            }
-        }, 2500);
-
-        // Random Session ID
-        setInterval(() => {
-            const el = document.getElementById('proto');
-            if(el) el.innerText = Math.floor(Math.random()*90000000)+10000000;
-        }, 50);
-
-        // Status
-        const st = ["CONNECTING...", "SYNCING...", "ENCRYPTING...", "PACKET_RX"];
-        let si = 0;
-        setInterval(() => {
-            const el = document.getElementById('status');
-            if(el) {
-                el.innerText = st[si];
-                si = (si + 1) % st.length;
-            }
-        }, 800);
-
-        // Health Percentage
-        setInterval(() => {
-            const el = document.getElementById('hlth');
-            if(el) el.innerText = (Math.random()*(99-97)+97).toFixed(1)+"%";
-        }, 3000);
-
-        // --- 3. PARALLAX EFFECT ---
-        document.addEventListener('mousemove', function(e) {
-            const root = document.getElementById('alien-f1-root');
-            if(root) {
-                const x = (window.innerWidth - e.clientX * 2) / 100;
-                const y = (window.innerHeight - e.clientY * 2) / 100;
-                root.style.setProperty('--x', e.clientX + 'px');
-                root.style.setProperty('--y', e.clientY + 'px');
-                const card = document.querySelector('.aug-card');
-                if(card) {
-                    // Increased smoothing slightly for glass effect feel
-                    card.style.transform = `perspective(1000px) rotateY(${x * 0.03}deg) rotateX(${y * -0.03}deg)`;
-                }
-            }
+        container.addEventListener('mousemove', (e) => {
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         });
 
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        container.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
+
+        container.addEventListener('mouseleave', () => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+
+        // --- 3. DYNAMIC DATA UPDATES ---
+        setInterval(() => {
+            document.getElementById('temp').innerText = Math.floor(Math.random() * (75 - 55) + 55);
+            document.getElementById('psi').innerText = Math.floor(Math.random() * (260 - 230) + 230);
+        }, 2000);
+
+        setInterval(() => {
+            // Random Hex Generator for System ID
+            const hex = Math.floor(Math.random()*16777215).toString(16).toUpperCase();
+            document.getElementById('sys-id').innerText = hex;
+        }, 500);
+
+        // Icons
+        lucide.createIcons();
     </script>
 </body>
 </html>
