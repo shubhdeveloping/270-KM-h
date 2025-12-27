@@ -39,7 +39,6 @@
 
         /* === 2. BACKGROUND LAYERS === */
         
-        /* Quantum Canvas (Particles) - Layer 1 */
         #quantum-canvas {
             position: fixed;
             top: 0; left: 0;
@@ -49,7 +48,6 @@
             opacity: 0.6;
         }
 
-        /* Moving 3D Grid Floor - Layer 0 */
         .cyber-grid {
             position: fixed;
             width: 200vw;
@@ -223,16 +221,16 @@
                 <div class="hud-module p-3 w-64 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase transform -skew-x-6">
                     <div class="flex flex-col gap-1 not-italic skew-x-6">
                         <div class="border-b border-teal-500/30 pb-1 mb-1 flex justify-between">
-                            <span>SYS.DIAGNOSTICS</span><span class="animate-pulse text-white">● REC</span>
+                            <span>VEHICLE.TELEMETRY</span><span class="animate-pulse text-white">● REC</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span>CORE_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
+                            <span>MOTOR_TEMP</span><span class="text-white"><span id="t1">72</span>°C</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span>QUANTUM_FLUX</span><span class="text-teal-300"><span id="t2">15</span> mK</span>
+                            <span>ENERGY_FLOW</span><span class="text-teal-300"><span id="t2">15</span> kW</span>
                         </div>
                         <div class="mt-2 text-xs text-teal-400 border-t border-teal-500/30 pt-1">
-                            <span class="mr-2">></span><span id="msg">INITIALIZING...</span>
+                            <span class="mr-2">></span><span id="msg">SYSTEM CHECK...</span>
                         </div>
                     </div>
                 </div>
@@ -241,22 +239,21 @@
             <div class="absolute top-4 right-4 z-40 origin-top-right transform scale-50 md:scale-100 md:top-8 md:right-8">
                 <div class="hud-module p-3 w-56 text-[10px] text-teal-500 font-tech tracking-[0.15em] uppercase border-l-0 border-r-2 transform -skew-x-6">
                     <div class="flex flex-col gap-1 skew-x-6">
-                        <div class="border-b border-teal-500/30 pb-1 mb-1 text-teal-600 text-right">LAB_DATA_STREAM_01</div>
-                        <div class="text-xs text-white mb-1 text-right">PROT_ID: <span id="proto" class="text-teal-300 font-mono">76266262</span></div>
+                        <div class="border-b border-teal-500/30 pb-1 mb-1 text-teal-600 text-right">PERFORMANCE_MONITOR</div>
+                        <div class="text-xs text-white mb-1 text-right">SESSION_ID: <span id="proto" class="text-teal-300 font-mono">76266262</span></div>
                         <div class="flex items-center justify-end gap-2">
-                            <span id="status" class="text-teal-400">SCANNING...</span>
+                            <span id="status" class="text-teal-400">CONNECTING...</span>
                             <div class="w-1.5 h-1.5 bg-teal-400 animate-ping rounded-full"></div>
                         </div>
                         <div class="mt-2 pt-1 border-t border-teal-500/30 flex justify-between items-center">
-                            <span class="text-gray-400">QI270 INTEG:</span>
+                            <span class="text-gray-400">BATTERY INTEGRITY:</span>
                             <span id="hlth" class="text-green-400 font-bold font-sporty text-lg">95.0%</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-
-            <div class="aug-card p-8 md:p-16 max-w-2xl w-full group collision-target">
+            <div class="aug-card p-8 md:p-16 max-w-2xl w-full group collision-target mt-20 md:mt-0">
                 <div class="tech-bracket tb-tl"></div>
                 <div class="tech-bracket tb-tr"></div>
                 <div class="tech-bracket tb-bl"></div>
@@ -265,8 +262,8 @@
                 <div class="text-center relative z-10">
                     
                     <div class="inline-block relative mb-4 collision-target">
-                        <h1 class="font-sporty text-7xl md:text-9xl leading-none italic pr-4 glitch">270</h1>
-                        <div class="absolute -right-6 top-0 flex flex-col items-center gap-1">
+                        <h1 class="font-sporty text-7xl md:text-9xl leading-none italic pr-8 glitch">270</h1>
+                        <div class="absolute -right-10 top-0 flex flex-col items-center gap-1">
                             <span class="text-[10px] bg-teal-500 text-black px-1 font-mono font-bold">MK.IV</span>
                             <span class="w-px h-12 bg-teal-500/50"></span>
                         </div>
@@ -318,7 +315,6 @@
         const ctx = canvas.getContext('2d');
         let particles = [];
         
-        // Resize Canvas
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -339,31 +335,25 @@
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-
-                // Bounce off edges
                 if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
                 if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
-
                 this.life++;
             }
 
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                
-                // Opacity Pulse
                 const alpha = (Math.sin(this.life * 0.05) + 1) / 2 * 0.5 + 0.2; 
-                ctx.fillStyle = `rgba(45, 212, 191, ${alpha})`; // Neon Teal
+                ctx.fillStyle = `rgba(45, 212, 191, ${alpha})`;
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = "#2dd4bf";
                 ctx.fill();
             }
         }
 
-        // Create initial particles
         function initParticles() {
             particles = [];
-            const numberOfParticles = Math.floor(window.innerWidth / 15); // Adjust density
+            const numberOfParticles = Math.floor(window.innerWidth / 15);
             for (let i = 0; i < numberOfParticles; i++) {
                 particles.push(new Particle());
             }
@@ -384,20 +374,20 @@
 
         // --- 2. HUD DATA UPDATES ---
         
-        // Random Core Temp
+        // Random Motor Temp
         setInterval(() => {
             const el = document.getElementById('t1');
             if(el) el.innerText = Math.floor(Math.random()*(90-50)+50);
         }, 1200);
 
-        // Random Flux
+        // Random Energy Flow (kW)
         setInterval(() => {
             const el = document.getElementById('t2');
-            if(el) el.innerText = Math.floor(Math.random()*(45-10)+10);
+            if(el) el.innerText = Math.floor(Math.random()*(250-10)+10);
         }, 150);
 
-        // System Messages
-        const msgs = ["INIT_SEQUENCE...", "CRYOGENIC_PUMPS: OK", "HELIUM-3: STABLE", "COHERENCE: OPTIMAL", "ENTANGLEMENT: ACTIVE"];
+        // System Messages (Updated Terms)
+        const msgs = ["SYSTEM_CHECK: OK", "TRACTION_CTRL: ON", "TORQUE_VECTOR: ACTIVE", "AERO_DYNAMICS: OPTIMAL", "TIRE_PRESSURE: STABLE"];
         let mi = 0;
         setInterval(() => {
             const el = document.getElementById('msg');
@@ -407,14 +397,14 @@
             }
         }, 2500);
 
-        // Random Protocol ID
+        // Random Session ID
         setInterval(() => {
             const el = document.getElementById('proto');
             if(el) el.innerText = Math.floor(Math.random()*90000000)+10000000;
         }, 50);
 
-        // Status Status
-        const st = ["SCANNING...", "VALIDATING...", "ENCRYPTING...", "PACKET_RX"];
+        // Status
+        const st = ["CONNECTING...", "SYNCING...", "ENCRYPTING...", "PACKET_RX"];
         let si = 0;
         setInterval(() => {
             const el = document.getElementById('status');
@@ -445,7 +435,6 @@
             }
         });
 
-        // --- 4. INITIALIZE ICONS ---
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
