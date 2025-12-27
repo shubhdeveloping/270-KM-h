@@ -2,22 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>270 KM/H | VELOCITY OS [MK.V]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>270 KM/H | QUANTUM F1 [MK.VIII]</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* === 0. CONSTANTS & RESET === */
+        /* === 0. CORE THEME === */
         :root {
-            --neon-teal: #0d9488; /* Teal 600 Base */
-            --neon-cyan: #2dd4bf; /* Teal 400 Highlight */
-            --neon-gold: #facc15; /* Yellow 400 Accent */
-            --void-bg: #020617;   /* Slate 950 */
-            --glass-surface: rgba(13, 148, 136, 0.03);
-            --glass-border: rgba(45, 212, 191, 0.2);
+            --neon-teal: #14b8a6; 
+            --neon-cyan: #2dd4bf; 
+            --neon-gold: #facc15; 
+            --void-bg: #020617;   
+            --glass-surface: rgba(2, 6, 23, 0.6);
+            --glass-border: rgba(45, 212, 191, 0.3);
         }
 
         body {
@@ -25,358 +25,217 @@
             background-color: var(--void-bg);
             color: white;
             font-family: 'Rajdhani', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
+            overflow: hidden; 
+            height: 100vh; width: 100vw;
             user-select: none;
         }
 
-        /* === 1. CINEMATIC POST-PROCESSING LAYERS === */
-        
-        /* CRT Scanline Effect */
+        /* === 1. VISUAL FX === */
         .scanlines {
-            position: fixed; inset: 0; pointer-events: none; z-index: 100;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px;
-            animation: scanlineScroll 0.5s linear infinite;
+            position: fixed; inset: 0; pointer-events: none; z-index: 50;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 3px;
             opacity: 0.3;
         }
-        
-        /* Vignette & Noise */
-        .atmosphere {
-            position: fixed; inset: 0; pointer-events: none; z-index: 99;
-            background: radial-gradient(circle at center, transparent 0%, var(--void-bg) 130%);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
-        }
 
-        /* Subtle Noise Overlay */
-        .noise {
-            position: fixed; inset: 0; pointer-events: none; z-index: 98;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
+        #warp-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
 
-        /* === 2. CANVAS & BACKGROUND === */
-        #warp-canvas {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;
-        }
-
-        /* === 3. ADVANCED GLASSMORPHISM CARD === */
-        .card-container {
-            perspective: 1500px;
-        }
-
-        .velocity-card {
+        /* === 2. UI COMPONENTS === */
+        .glass-panel {
             background: var(--glass-surface);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-top: 1px solid rgba(250, 204, 21, 0.2); /* Gold Top Hint */
-            box-shadow: 
-                0 0 0 1px rgba(0,0,0,0.5), /* Inner darkness */
-                0 20px 50px rgba(0,0,0,0.5), /* Drop shadow */
-                0 0 100px rgba(13, 148, 136, 0.1); /* Teal Glow */
-            transform-style: preserve-3d;
-            will-change: transform;
-            transition: transform 0.1s ease-out;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.1);
         }
 
-        /* The "Scanner" Light passing over the glass */
-        .velocity-card::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transform: skewX(-20deg);
-            animation: lightScan 6s infinite ease-in-out;
-            pointer-events: none;
-        }
+        .hud-text { font-family: 'Share Tech Mono', monospace; }
+        .race-font { font-family: 'Orbitron', sans-serif; }
 
-        @keyframes lightScan {
-            0%, 80% { left: -100%; }
-            100% { left: 200%; }
-        }
-
-        /* === 4. TYPOGRAPHY & EFFECTS === */
-        .font-orbitron { font-family: 'Orbitron', sans-serif; }
-        .font-mono { font-family: 'Share Tech Mono', monospace; }
-
-        /* Glitch Title Logic */
-        .glitch-text {
-            position: relative;
-            color: white;
-            text-shadow: 2px 2px 0px var(--neon-teal);
-        }
+        /* Glitch Effect */
+        .glitch-text { position: relative; color: white; }
         .glitch-text::before, .glitch-text::after {
-            content: attr(data-text);
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--void-bg);
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--void-bg); opacity: 0.8;
         }
         .glitch-text::before {
-            left: 2px; text-shadow: -1px 0 var(--neon-gold);
-            clip-path: inset(0 0 0 0);
-            animation: glitch-anim-1 4s infinite linear alternate-reverse;
+            left: 2px; text-shadow: -1px 0 var(--neon-gold); clip-path: inset(0 0 0 0);
+            animation: glitch-1 4s infinite linear alternate-reverse;
         }
         .glitch-text::after {
-            left: -2px; text-shadow: -1px 0 var(--neon-cyan);
-            clip-path: inset(0 0 0 0);
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+            left: -2px; text-shadow: -1px 0 var(--neon-cyan); clip-path: inset(0 0 0 0);
+            animation: glitch-2 3s infinite linear alternate-reverse;
         }
+        @keyframes glitch-1 { 0% { clip-path: inset(20% 0 80% 0); } 100% { clip-path: inset(80% 0 5% 0); } }
+        @keyframes glitch-2 { 0% { clip-path: inset(10% 0 60% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
 
-        @keyframes glitch-anim-1 {
-            0% { clip-path: inset(20% 0 80% 0); }
-            20% { clip-path: inset(60% 0 10% 0); }
-            40% { clip-path: inset(40% 0 50% 0); }
-            60% { clip-path: inset(80% 0 5% 0); }
-            80% { clip-path: inset(10% 0 60% 0); }
-            100% { clip-path: inset(30% 0 30% 0); }
+        /* RPM Bar Loop */
+        .rpm-bar-container { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden; }
+        .rpm-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, transparent, #14b8a6, #facc15);
+            box-shadow: 0 0 15px #14b8a6;
+            animation: rev-engine 2.5s infinite ease-out;
         }
-        @keyframes glitch-anim-2 {
-            0% { clip-path: inset(10% 0 60% 0); }
-            20% { clip-path: inset(30% 0 20% 0); }
-            40% { clip-path: inset(70% 0 10% 0); }
-            60% { clip-path: inset(20% 0 50% 0); }
-            80% { clip-path: inset(50% 0 30% 0); }
-            100% { clip-path: inset(5% 0 80% 0); }
-        }
+        @keyframes rev-engine { 0% { width: 10%; opacity: 0.5; } 40% { width: 90%; opacity: 1; } 60% { width: 85%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
 
-        /* === 5. HUD ELEMENTS === */
-        .hud-bracket {
-            position: absolute; width: 15px; height: 15px;
-            border: 2px solid var(--neon-cyan);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-        .hud-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-        .hud-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; border-color: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold); }
-        .hud-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; border-color: var(--neon-gold); box-shadow: 0 0 10px var(--neon-gold); }
-        .hud-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+        /* Brackets */
+        .tech-bracket { position: absolute; width: 10px; height: 10px; border: 2px solid var(--neon-gold); transition: 0.3s; }
+        .tb-tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+        .tb-tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; }
+        .tb-bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; border-color: var(--neon-cyan); }
+        .tb-br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; border-color: var(--neon-cyan); }
 
-        .velocity-card:hover .hud-bracket { width: 30px; height: 30px; }
+        /* Button */
+        .cyber-btn {
+            background: rgba(20, 184, 166, 0.1); border: 1px solid var(--neon-teal);
+            position: relative; overflow: hidden; transition: 0.3s;
+        }
+        .cyber-btn:active { transform: scale(0.95); }
+        .cyber-btn:hover { background: var(--neon-gold); color: black; border-color: var(--neon-gold); box-shadow: 0 0 20px rgba(250, 204, 21, 0.5); }
 
-        /* The Button */
-        .btn-launch {
-            background: rgba(13, 148, 136, 0.1);
-            position: relative; overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-        .btn-launch:hover {
-            background: var(--neon-gold);
-            color: black;
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(250, 204, 21, 0.4);
-        }
-        .btn-launch::before {
-            content:''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
-            transition: 0.5s;
-        }
-        .btn-launch:hover::before { left: 100%; }
-
-        /* Audio Visualizer (CSS only) */
-        .viz-bar {
-            width: 4px; background: var(--neon-teal);
-            animation: equalizer 1s ease-in-out infinite;
-            box-shadow: 0 0 8px var(--neon-teal);
-        }
-        @keyframes equalizer {
-            0%, 100% { height: 10%; opacity: 0.3; }
-            50% { height: 100%; opacity: 1; background: var(--neon-gold); box-shadow: 0 0 15px var(--neon-gold); }
-        }
-        
     </style>
 </head>
 <body>
 
     <div class="scanlines"></div>
-    <div class="atmosphere"></div>
-    <div class="noise"></div>
     <canvas id="warp-canvas"></canvas>
 
-    <main class="relative z-50 w-full h-full flex flex-col items-center justify-center p-6 card-container" id="main-container">
+    <div class="relative z-50 h-full w-full flex flex-col justify-between p-4 md:p-8">
 
-        <div class="absolute top-8 left-8 hidden md:block">
-            <div class="text-[10px] font-mono text-teal-500 tracking-[0.2em] mb-1 hacker-text" data-value="SYSTEM.TELEMTRY // ACTIVE">SYSTEM.TELEMTRY // INIT</div>
-            <div class="flex gap-1 h-1 w-32">
-                <div class="h-full bg-teal-500 w-1/3 animate-pulse"></div>
-                <div class="h-full bg-teal-800 w-2/3"></div>
+        <div class="flex justify-between items-start">
+            <div class="glass-panel p-2 md:p-4 rounded-lg flex flex-col gap-1 w-40 relative">
+                <div class="tech-bracket tb-tl"></div>
+                <div class="text-[9px] text-teal-400 hud-text uppercase tracking-widest">System Status</div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm md:text-base font-bold race-font text-white">ONLINE</span>
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_#4ade80]"></div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-2 md:p-4 rounded-lg flex flex-col gap-1 w-40 text-right relative">
+                <div class="tech-bracket tb-tr"></div>
+                <div class="text-[9px] text-teal-400 hud-text uppercase tracking-widest">Lab Data Stream</div>
+                <div class="flex justify-end items-center gap-2">
+                    <span class="text-xl md:text-2xl font-bold race-font text-yellow-400">1</span>
+                    <i data-lucide="activity" class="w-3 h-3 text-teal-400"></i>
+                </div>
             </div>
         </div>
 
-        <div class="absolute top-8 right-8 hidden md:block text-right">
-            <div class="text-[10px] font-mono text-yellow-500 tracking-[0.2em] mb-1">SESSION_ID</div>
-            <div class="text-xl font-orbitron text-white hacker-text" data-value="MK.V-2026">0000-0000</div>
-        </div>
-
-        <div class="velocity-card max-w-3xl w-full p-10 md:p-16 rounded-xl flex flex-col items-center text-center group" id="tilt-card">
+        <div class="flex flex-col items-center justify-center flex-grow perspective-1000">
             
-            <div class="hud-bracket hud-tl"></div>
-            <div class="hud-bracket hud-tr"></div>
-            <div class="hud-bracket hud-bl"></div>
-            <div class="hud-bracket hud-br"></div>
+            <div class="glass-panel p-6 md:p-12 rounded-2xl max-w-2xl w-full text-center relative group transform transition-all duration-300">
+                <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-yellow-400"></div>
+                <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-yellow-400"></div>
+                <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-teal-400"></div>
+                <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-teal-400"></div>
 
-            <div class="w-full flex justify-between items-end border-b border-teal-500/20 pb-4 mb-10">
-                <div class="flex flex-col items-start">
-                    <span class="text-[10px] text-teal-400 font-mono tracking-widest uppercase mb-1">Current Velocity</span>
-                    <div class="flex items-center gap-2">
-                        <div class="w-2 h-2 bg-yellow-400 rounded-full animate-ping"></div>
-                        <span class="text-xs text-white/70 font-mono">LIVE FEED</span>
+                <div class="flex justify-center items-center gap-2 mb-4 h-6">
+                    <div class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping"></div>
+                    <span id="sys-msg" class="text-[10px] md:text-xs text-teal-300 hud-text tracking-widest uppercase">DATA RECEIVING...</span>
+                </div>
+
+                <div class="relative inline-block">
+                    <h1 class="text-7xl md:text-9xl race-font font-black italic text-white leading-none glitch-text tracking-tighter" data-text="270">270</h1>
+                    <div class="absolute top-0 -right-4 md:-right-8 flex flex-col gap-0.5">
+                        <span class="bg-yellow-500 text-black text-[9px] font-bold px-1 rounded-sm hud-text">MK.VIII</span>
                     </div>
                 </div>
-                <div class="flex gap-1 items-end h-8" id="visualizer">
+
+                <div class="text-xl md:text-2xl text-teal-200 race-font italic opacity-80 mb-6 flex items-center justify-center gap-2">
+                    <span class="w-8 h-px bg-teal-500/50"></span>
+                    KM / H
+                    <span class="w-8 h-px bg-teal-500/50"></span>
+                </div>
+
+                <div class="w-full h-2 md:h-3 rpm-bar-container mb-8">
+                    <div class="rpm-fill"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 md:gap-4 mb-8">
+                    <div class="bg-black/30 p-2 rounded border border-teal-500/10">
+                        <div class="text-[8px] text-gray-400 uppercase hud-text">Motor Temp</div>
+                        <div class="text-lg md:text-xl text-teal-300 font-bold race-font"><span id="val-temp">72</span>°C</div>
                     </div>
-            </div>
-
-            <div class="relative mb-6">
-                <h1 class="font-orbitron text-8xl md:text-[10rem] leading-none italic font-black glitch-text tracking-tighter mix-blend-screen" data-text="270">
-                    270
-                </h1>
-                <div class="absolute -top-4 -right-4 bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 transform rotate-12 shadow-[0_0_20px_rgba(250,204,21,0.8)] font-mono">
-                    MK.V
+                    <div class="bg-black/30 p-2 rounded border border-teal-500/10">
+                        <div class="text-[8px] text-gray-400 uppercase hud-text">Energy Flow</div>
+                        <div class="text-lg md:text-xl text-yellow-300 font-bold hud-text"><span id="val-nrg">15</span> kW</div>
+                    </div>
                 </div>
+
+                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="cyber-btn w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-white group">
+                    <span>Initialize Launch</span>
+                    <i data-lucide="chevron-right" class="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
             </div>
-
-            <div class="flex items-center gap-4 text-2xl md:text-3xl font-orbitron text-teal-100 italic mb-12 opacity-90">
-                <span class="text-teal-600 font-light">///</span>
-                <span class="hacker-text" data-value="KILOMETERS PER HOUR">LOADING DATA</span>
-                <span class="text-teal-600 font-light">///</span>
-            </div>
-
-            <div class="grid grid-cols-3 gap-4 w-full mb-12 border-t border-teal-500/20 pt-6">
-                <div class="text-center border-r border-teal-500/10">
-                    <div class="text-teal-500 text-[10px] font-mono tracking-widest uppercase mb-1">Aerodynamics</div>
-                    <div class="text-white font-bold font-orbitron text-lg">0.21 Cd</div>
-                </div>
-                <div class="text-center border-r border-teal-500/10">
-                    <div class="text-yellow-500 text-[10px] font-mono tracking-widest uppercase mb-1">Downforce</div>
-                    <div class="text-white font-bold font-orbitron text-lg">850 KG</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-teal-500 text-[10px] font-mono tracking-widest uppercase mb-1">Power Unit</div>
-                    <div class="text-white font-bold font-orbitron text-lg">V6 HYBRID</div>
-                </div>
-            </div>
-
-            <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="btn-launch px-12 py-5 text-teal-300 font-orbitron font-bold tracking-[0.25em] uppercase border border-teal-500/50 text-sm group-hover:text-black">
-                Confirm Entry
-            </a>
-
         </div>
 
-        <div class="absolute bottom-6 w-full text-center">
-            <p class="text-[9px] text-teal-600 font-mono tracking-[0.5em] uppercase opacity-70">
-                System optimized for high velocity environments
-            </p>
+        <div class="flex flex-col items-center justify-end pb-4 gap-1 opacity-90">
+            <div class="flex items-end gap-1 h-4">
+                <div class="w-1 bg-teal-500 animate-[pulse_0.5s_ease-in-out_infinite] h-2"></div>
+                <div class="w-1 bg-yellow-500 animate-[pulse_0.5s_ease-in-out_infinite] h-3" style="animation-delay: 0.1s"></div>
+                <div class="w-1 bg-teal-300 animate-[pulse_0.5s_ease-in-out_infinite] h-4" style="animation-delay: 0.2s"></div>
+                <div class="w-1 bg-yellow-500 animate-[pulse_0.5s_ease-in-out_infinite] h-2" style="animation-delay: 0.3s"></div>
+            </div>
+            <div class="text-[10px] md:text-xs text-teal-400 hud-text tracking-[0.3em] font-bold uppercase">
+                System compiling... 49%
+            </div>
         </div>
 
-    </main>
+    </div>
 
     <script>
-        /** * === VELOCITY OS MK.V ENGINE ===
-         * Includes: Starfield Warp, Hacker Text Decoder, 3D Tilt Logic
-         */
-
-        // 1. SETUP VISUALIZER BARS
-        const vizContainer = document.getElementById('visualizer');
-        for(let i=0; i<8; i++){
-            const bar = document.createElement('div');
-            bar.className = 'viz-bar';
-            bar.style.animationDelay = `${Math.random() * 0.5}s`;
-            bar.style.height = `${Math.random() * 50 + 20}%`;
-            vizContainer.appendChild(bar);
-        }
-
-        // 2. HACKER TEXT DECODER CLASS
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_#@&";
+        // === 1. LIVE DATA SIMULATION (FLUCTUATING NUMBERS) ===
         
-        class TextScramble {
-            constructor(el) {
-                this.el = el;
-                this.originalText = el.dataset.value || el.innerText;
-                this.frame = 0;
-                this.queue = [];
-                this.resolve();
-            }
+        // Motor Temp (Fluctuate between 65 and 85)
+        setInterval(() => {
+            const el = document.getElementById('val-temp');
+            const current = parseInt(el.innerText);
+            const change = Math.floor(Math.random() * 5) - 2; 
+            let newVal = current + change;
+            if(newVal > 85) newVal = 85;
+            if(newVal < 65) newVal = 65;
+            el.innerText = newVal;
+        }, 800);
 
-            resolve() {
-                const startText = this.el.innerText;
-                const endText = this.originalText;
-                const length = Math.max(startText.length, endText.length);
-                
-                this.queue = [];
-                for (let i = 0; i < length; i++) {
-                    const from = startText[i] || '';
-                    const to = endText[i] || '';
-                    const start = Math.floor(Math.random() * 40);
-                    const end = start + Math.floor(Math.random() * 40);
-                    this.queue.push({ from, to, start, end });
-                }
-                
-                cancelAnimationFrame(this.frameRequest);
-                this.frame = 0;
-                this.update();
-            }
+        // Energy Flow (Rapid fluctuation)
+        setInterval(() => {
+            const el = document.getElementById('val-nrg');
+            el.innerText = Math.floor(Math.random() * (25 - 10) + 10);
+        }, 150);
 
-            update() {
-                let output = '';
-                let complete = 0;
-                
-                for (let i = 0, n = this.queue.length; i < n; i++) {
-                    let { from, to, start, end, char } = this.queue[i];
-                    if (this.frame >= end) {
-                        complete++;
-                        output += to;
-                    } else if (this.frame >= start) {
-                        if (!char || Math.random() < 0.28) {
-                            char = letters[Math.floor(Math.random() * letters.length)];
-                            this.queue[i].char = char;
-                        }
-                        output += `<span class="text-yellow-500 opacity-70">${char}</span>`;
-                    } else {
-                        output += from;
-                    }
-                }
-                
-                this.el.innerHTML = output;
-                
-                if (complete === this.queue.length) return; 
-
-                this.frameRequest = requestAnimationFrame(this.update.bind(this));
-                this.frame++;
+        // === 2. STATUS SEQUENCE ===
+        // Sequence: Data receiving -> Encrypting -> Analysing -> Done
+        const messages = ["Data receiving...", "Encrypting...", "Analysing...", "Done"];
+        let msgIndex = 0;
+        
+        function updateStatus() {
+            const el = document.getElementById('sys-msg');
+            el.innerText = messages[msgIndex];
+            
+            // If we hit "Done", pause longer, then restart
+            if(msgIndex === messages.length - 1) {
+                setTimeout(() => {
+                    msgIndex = 0;
+                    updateStatus();
+                }, 4000); // Stay on "Done" for 4 seconds
+            } else {
+                msgIndex++;
+                setTimeout(updateStatus, 1500); // 1.5 seconds per step
             }
         }
+        // Start sequence
+        updateStatus();
 
-        // Initialize Scramblers
-        document.querySelectorAll('.hacker-text').forEach(el => new TextScramble(el));
 
-        // 3. 3D TILT EFFECT
-        const card = document.getElementById('tilt-card');
-        const container = document.getElementById('main-container');
-
-        document.addEventListener('mousemove', (e) => {
-            if (window.innerWidth < 768) return; // Disable on mobile
-            
-            const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
-            const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
-            
-            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-        });
-
-        // 4. HYPER-SPEED STARFIELD CANVAS
+        // === 3. WARP DRIVE VISUALS ===
         const canvas = document.getElementById('warp-canvas');
         const ctx = canvas.getContext('2d');
-
         let width, height;
         let stars = [];
-        const starCount = 400; // More stars = more speed feel
         
-        // Mouse influence on warp direction
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - width/2) * 0.5;
-            mouseY = (e.clientY - height/2) * 0.5;
-        });
+        const isMobile = window.innerWidth < 768;
+        const starCount = isMobile ? 100 : 350;
 
         function resize() {
             width = window.innerWidth;
@@ -388,83 +247,52 @@
         resize();
 
         class Star {
-            constructor() {
-                this.init();
-            }
-
+            constructor() { this.init(); }
             init() {
                 this.x = (Math.random() - 0.5) * width * 2; 
                 this.y = (Math.random() - 0.5) * height * 2;
                 this.z = Math.random() * width; 
-                this.pz = this.z; // Previous Z for trail calculation
-                
-                // Color variation: Teal, White, or Yellow
-                const rand = Math.random();
-                if(rand > 0.9) this.color = '#facc15'; // Yellow
-                else if (rand > 0.6) this.color = '#2dd4bf'; // Teal
-                else this.color = '#ffffff';
+                this.pz = this.z;
+                this.color = Math.random() > 0.8 ? '#facc15' : '#14b8a6'; 
             }
-
             update() {
-                // Move star closer (decrease Z)
-                // Speed is constant + slight mouse influence
-                this.z = this.z - 15; 
-
+                this.z -= 15; // Speed
                 if (this.z < 1) {
                     this.init();
                     this.z = width;
                     this.pz = this.z;
                 }
             }
-
             draw() {
-                // Perspective projection math
-                let sx = (this.x / this.z) * width + width/2 + (mouseX * 0.05); // Add parallax
-                let sy = (this.y / this.z) * height + height/2 + (mouseY * 0.05);
-
-                // Calculate "Previous" position for the trail effect (warp lines)
-                let px = (this.x / this.pz) * width + width/2 + (mouseX * 0.05);
-                let py = (this.y / this.pz) * height + height/2 + (mouseY * 0.05);
-
+                let sx = (this.x / this.z) * width + width/2;
+                let sy = (this.y / this.z) * height + height/2;
+                let px = (this.x / this.pz) * width + width/2;
+                let py = (this.y / this.pz) * height + height/2;
                 this.pz = this.z;
 
                 if (sx < 0 || sx > width || sy < 0 || sy > height) return;
-
-                // Opacity based on distance
-                const alpha = 1 - (this.z / width);
                 
-                // Draw the warp line
+                const alpha = 1 - (this.z / width);
                 ctx.beginPath();
                 ctx.moveTo(px, py);
                 ctx.lineTo(sx, sy);
                 ctx.strokeStyle = this.color;
-                ctx.lineWidth = (1 - this.z / width) * 2; // Thicker as it gets closer
+                ctx.lineWidth = (1 - this.z / width) * (isMobile ? 1 : 2);
                 ctx.globalAlpha = alpha;
                 ctx.stroke();
             }
         }
 
-        // Initialize Stars
-        for(let i=0; i<starCount; i++) {
-            stars.push(new Star());
-        }
+        for(let i=0; i<starCount; i++) stars.push(new Star());
 
         function animate() {
-            // Trail effect: instead of clearRect, draw a semi-transparent black rect
-            // This creates the blur/motion trail feel
             ctx.fillStyle = 'rgba(2, 6, 23, 0.4)'; 
             ctx.fillRect(0, 0, width, height);
-
-            stars.forEach(star => {
-                star.update();
-                star.draw();
-            });
-
+            stars.forEach(star => { star.update(); star.draw(); });
             requestAnimationFrame(animate);
         }
         animate();
 
-        // Icons
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
     </script>
