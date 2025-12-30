@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>270 KM/H | SINGULARITY [MK.IX]</title>
+    <title>270 KM/H | SINGULARITY [MK.X]</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* === 0. QUANTUM PALETTE === */
+        /* === 0. QUANTUM PALETTE & SETUP === */
         :root {
             --neon-teal: #14b8a6; 
             --neon-cyan: #2dd4bf; 
             --neon-gold: #facc15; 
-            --void-bg: #020617;   
-            /* Enhanced Glass Variables */
-            --glass-bg: rgba(2, 6, 23, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-highlight: rgba(255, 255, 255, 0.05);
+            --void-bg: #020617;    
+            
+            /* Cinematic Glass */
+            --glass-bg: rgba(2, 6, 23, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shine: rgba(255, 255, 255, 0.03);
         }
 
         body {
@@ -30,122 +31,150 @@
             overflow: hidden; 
             height: 100vh; width: 100vw;
             user-select: none;
+            perspective: 1500px; /* For 3D Tilt */
         }
 
-        /* === 1. BACKGROUND LAYERS === */
+        /* === 1. ATMOSPHERICS === */
+        /* Scanlines with slight flicker */
         .scanlines {
-            position: fixed; inset: 0; pointer-events: none; z-index: 5;
+            position: fixed; inset: 0; pointer-events: none; z-index: 10;
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 3px;
-            opacity: 0.2;
+            background-size: 100% 4px;
+            opacity: 0.15;
+            animation: scanlineScroll 0.5s linear infinite;
+        }
+
+        /* Vignette to focus eyes on center */
+        .vignette {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
         }
 
         #quantum-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
 
-        /* === 2. CORNER PULSE ANIMATION === */
-        .corner-pulse {
-            position: fixed; z-index: 2; pointer-events: none;
-            width: 100px; height: 100px;
-            filter: blur(20px); opacity: 0;
-            animation: pulseInward 3s infinite ease-in-out;
-        }
-        .cp-tl { top: 0; left: 0; background: radial-gradient(circle at top left, var(--neon-teal), transparent 70%); }
-        .cp-tr { top: 0; right: 0; background: radial-gradient(circle at top right, var(--neon-gold), transparent 70%); animation-delay: 0.5s; }
-        .cp-bl { bottom: 0; left: 0; background: radial-gradient(circle at bottom left, var(--neon-gold), transparent 70%); animation-delay: 1s; }
-        .cp-br { bottom: 0; right: 0; background: radial-gradient(circle at bottom right, var(--neon-teal), transparent 70%); animation-delay: 1.5s; }
-
-        @keyframes pulseInward {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { opacity: 0.4; }
-            100% { transform: scale(1.5); opacity: 0; }
+        /* === 2. UI ARCHITECTURE === */
+        /* The container for the 3D Tilt effect */
+        .holo-container {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
         }
 
-        /* === 3. ADVANCED GLASSMORPHISM === */
         .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-top: 1px solid var(--glass-highlight);
             box-shadow: 
-                0 4px 30px rgba(0, 0, 0, 0.5),
-                inset 0 0 20px rgba(255, 255, 255, 0.02);
+                0 0 0 1px rgba(0,0,0,0.3),
+                0 20px 50px rgba(0,0,0,0.5),
+                inset 0 0 60px rgba(255,255,255,0.02);
             position: relative;
+            overflow: hidden;
         }
         
+        /* Noise Texture for Realism */
         .glass-panel::before {
             content: ''; position: absolute; inset: 0;
-            background: linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.03) 30%, transparent 60%);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            opacity: 0.4; mix-blend-mode: overlay; pointer-events: none;
+        }
+
+        /* Sheen Animation */
+        .sheen-overflow { overflow: hidden; position: relative; }
+        .sheen-overflow::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg);
+            animation: sheenPass 6s infinite ease-in-out;
             pointer-events: none;
         }
 
-        /* === 4. TYPOGRAPHY & ELEMENTS === */
+        /* === 3. TYPOGRAPHY & FX === */
         .hud-font { font-family: 'Share Tech Mono', monospace; }
         .race-font { font-family: 'Orbitron', sans-serif; }
 
-        .glitch-text { position: relative; color: white; }
+        .glitch-text { position: relative; color: white; transform-style: preserve-3d; transform: translateZ(20px); }
         .glitch-text::before, .glitch-text::after {
-            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--void-bg); opacity: 0.8;
+            content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--void-bg);
         }
         .glitch-text::before {
-            left: 2px; text-shadow: -1px 0 var(--neon-gold); clip-path: inset(0 0 0 0);
+            left: 2px; text-shadow: -2px 0 var(--neon-gold); clip-path: inset(0 0 0 0);
             animation: glitch-1 4s infinite linear alternate-reverse;
+            z-index: -1;
         }
         .glitch-text::after {
-            left: -2px; text-shadow: -1px 0 var(--neon-cyan); clip-path: inset(0 0 0 0);
+            left: -2px; text-shadow: -2px 0 var(--neon-cyan); clip-path: inset(0 0 0 0);
             animation: glitch-2 3s infinite linear alternate-reverse;
+            z-index: -2;
         }
-        @keyframes glitch-1 { 0% { clip-path: inset(20% 0 80% 0); } 100% { clip-path: inset(80% 0 5% 0); } }
-        @keyframes glitch-2 { 0% { clip-path: inset(10% 0 60% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
 
-        /* Tech Corners */
-        .bracket { position: absolute; width: 15px; height: 15px; border: 2px solid var(--neon-cyan); transition: 0.3s; }
-        .b-tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
-        .b-tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; border-color: var(--neon-gold); }
-        .b-bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; border-color: var(--neon-gold); }
-        .b-br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+        /* Tech Corners (Brackets) */
+        .bracket { position: absolute; width: 20px; height: 20px; border: 2px solid var(--neon-cyan); transition: 0.3s; opacity: 0.7; }
+        .b-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+        .b-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; border-color: var(--neon-gold); }
+        .b-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; border-color: var(--neon-gold); }
+        .b-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
-        /* The LinkedIn Button */
+        /* The Button */
         .btn-link {
-            background: linear-gradient(90deg, rgba(20, 184, 166, 0.1), rgba(250, 204, 21, 0.05));
-            border: 1px solid rgba(20, 184, 166, 0.5);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(20, 184, 166, 0.05);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.1);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            backdrop-filter: blur(4px);
         }
         .btn-link:hover {
             background: rgba(20, 184, 166, 0.2);
             border-color: var(--neon-gold);
-            box-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
-            letter-spacing: 0.25em;
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.4);
+            letter-spacing: 0.35em;
+            text-shadow: 0 0 8px rgba(255,255,255,0.8);
+            transform: translateY(-2px);
         }
-        .btn-link i { transition: 0.3s; }
-        .btn-link:hover i { color: var(--neon-gold); transform: scale(1.2); }
 
-        /* Data Row Styling */
-        .data-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 2px 0; }
-        .data-label { font-size: 8px; color: #9ca3af; letter-spacing: 1px; }
-        .data-val { font-size: 10px; font-weight: bold; font-family: 'Share Tech Mono', monospace; }
+        /* Data Styling */
+        .data-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 4px 0; }
+        .data-label { font-size: 9px; color: #9ca3af; letter-spacing: 1px; text-transform: uppercase; }
+        .data-val { font-size: 11px; font-weight: bold; font-family: 'Share Tech Mono', monospace; text-shadow: 0 0 5px rgba(20, 184, 166, 0.5); }
+
+        /* Animations */
+        @keyframes pulseInward { 0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.4; } 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes glitch-1 { 0% { clip-path: inset(20% 0 80% 0); } 100% { clip-path: inset(80% 0 5% 0); } }
+        @keyframes glitch-2 { 0% { clip-path: inset(10% 0 60% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
+        @keyframes sheenPass { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+        @keyframes scanlineScroll { 0% { background-position: 0% 0%; } 100% { background-position: 0% 100%; } }
+        @keyframes loadBar { 0% { width: 49%; } 50% { width: 55%; } 70% { width: 51%; } 100% { width: 62%; } }
+        @keyframes ambientGlow { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+
+        /* Intro Animation Stagger */
+        .anim-entry { opacity: 0; animation: fadeUp 1s forwards cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
     </style>
 </head>
 <body>
 
     <div class="scanlines"></div>
-    <div class="corner-pulse cp-tl"></div>
-    <div class="corner-pulse cp-tr"></div>
-    <div class="corner-pulse cp-bl"></div>
-    <div class="corner-pulse cp-br"></div>
+    <div class="vignette"></div>
     
     <canvas id="quantum-canvas"></canvas>
 
-    <div class="relative z-50 h-full w-full flex flex-col justify-between p-3 md:p-6 overflow-hidden">
+    <div id="ui-layer" class="relative z-50 h-full w-full flex flex-col justify-between p-4 md:p-8 overflow-hidden">
 
-        <div class="flex justify-between items-start gap-2">
+        <div class="flex justify-between items-start gap-4 perspective-container">
             
-            <div class="glass-panel p-3 rounded-md w-40 md:w-56">
+            <div class="glass-panel p-4 rounded-sm w-44 md:w-60 anim-entry delay-1 sheen-overflow">
                 <div class="bracket b-tl"></div>
-                <div class="flex items-center gap-2 mb-2 border-b border-teal-500/30 pb-1">
-                    <div class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                    <span class="text-[10px] text-teal-300 font-bold tracking-widest uppercase">System Status</span>
+                <div class="flex items-center gap-3 mb-3 border-b border-teal-500/30 pb-2">
+                    <div class="relative">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-ping absolute opacity-75"></div>
+                        <div class="w-2 h-2 bg-green-400 rounded-full relative"></div>
+                    </div>
+                    <span class="text-[10px] text-teal-300 font-bold tracking-[0.2em] uppercase">System Status</span>
                 </div>
                 <div class="flex flex-col gap-1">
                     <div class="data-row">
@@ -167,10 +196,10 @@
                 </div>
             </div>
 
-            <div class="glass-panel p-3 rounded-md w-40 md:w-56 text-right">
+            <div class="glass-panel p-4 rounded-sm w-44 md:w-60 text-right anim-entry delay-1 sheen-overflow">
                 <div class="bracket b-tr"></div>
-                <div class="flex items-center justify-end gap-2 mb-2 border-b border-yellow-500/30 pb-1">
-                    <span class="text-[10px] text-yellow-300 font-bold tracking-widest uppercase">Lab Stream</span>
+                <div class="flex items-center justify-end gap-3 mb-3 border-b border-yellow-500/30 pb-2">
+                    <span class="text-[10px] text-yellow-300 font-bold tracking-[0.2em] uppercase">Lab Stream</span>
                     <i data-lucide="database" class="w-3 h-3 text-yellow-400"></i>
                 </div>
                 <div class="flex flex-col gap-1">
@@ -194,57 +223,67 @@
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-center flex-grow perspective-1000 mt-4 mb-4">
+        <div class="flex flex-col items-center justify-center flex-grow mt-4 mb-4" style="perspective: 1000px;">
             
-            <div class="glass-panel p-6 md:p-12 rounded-2xl max-w-2xl w-full text-center relative group transform transition-all duration-300">
-                <div class="bracket b-tl"></div><div class="bracket b-tr"></div>
-                <div class="bracket b-bl"></div><div class="bracket b-br"></div>
+            <div id="main-card" class="holo-container glass-panel p-8 md:p-16 rounded-xl max-w-3xl w-full text-center group transform transition-all duration-100 anim-entry delay-2">
+                
+                <div class="bracket b-tl" style="width: 40px; height: 40px;"></div>
+                <div class="bracket b-tr" style="width: 40px; height: 40px;"></div>
+                <div class="bracket b-bl" style="width: 40px; height: 40px;"></div>
+                <div class="bracket b-br" style="width: 40px; height: 40px;"></div>
 
-                <div class="flex justify-center items-center gap-2 mb-6 h-6">
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-teal-500/20 blur-[100px] rounded-full pointer-events-none" style="animation: ambientGlow 4s infinite alternate;"></div>
+
+                <div class="flex justify-center items-center gap-3 mb-8 h-6 relative z-10">
                     <div class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping"></div>
-                    <span id="sys-msg" class="text-[10px] md:text-xs text-teal-300 hud-font tracking-[0.2em] uppercase">DATA RECEIVING...</span>
+                    <span id="sys-msg" class="text-[10px] md:text-xs text-teal-300 hud-font tracking-[0.3em] uppercase font-bold">DATA RECEIVING...</span>
                 </div>
 
-                <div class="mb-4">
-                    <span class="inline-block border border-teal-500/50 rounded px-2 py-0.5 text-[9px] text-teal-200 tracking-[0.3em] uppercase bg-teal-900/30">
+                <div class="mb-6 relative z-10">
+                    <span class="inline-block border border-teal-500/50 rounded px-3 py-1 text-[10px] text-teal-100 tracking-[0.4em] uppercase bg-teal-900/40 backdrop-blur-md shadow-[0_0_10px_rgba(20,184,166,0.3)]">
                         Launching in 2026
                     </span>
                 </div>
 
-                <div class="relative inline-block mb-2">
-                    <h1 class="text-8xl md:text-[9rem] race-font font-black italic text-white leading-none glitch-text tracking-tighter" data-text="270">2<span class="text-yellow-400">7</span>0</h1>
+                <div class="relative inline-block mb-4 z-20 hover:scale-105 transition-transform duration-500">
+                    <h1 class="text-[6rem] md:text-[11rem] race-font font-black italic text-white leading-none glitch-text tracking-tighter drop-shadow-2xl" data-text="270">2<span class="text-yellow-400">7</span>0</h1>
                 </div>
 
-                <div class="text-sm md:text-lg text-teal-200/80 race-font uppercase tracking-[0.2em] mb-8 border-b border-white/10 pb-4 inline-block">
+                <div class="text-sm md:text-xl text-teal-200/80 race-font uppercase tracking-[0.25em] mb-10 border-b border-white/10 pb-6 inline-block relative z-10">
                     Aerodynamics Beyond Physics
                 </div>
 
-                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="btn-link w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-white group cursor-pointer relative overflow-hidden">
-                    <span class="relative z-10 mr-3">You're Invited</span>
-                    <i data-lucide="linkedin" class="w-4 h-4 relative z-10 text-white group-hover:text-yellow-400"></i>
-                    <span class="ml-3 relative z-10 text-[10px] opacity-70 group-hover:opacity-100 transition-opacity">Confirm Attendance</span>
-                </a>
+                <div class="relative z-30">
+                    <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="btn-link w-full md:w-auto inline-flex items-center justify-center px-10 py-5 rounded-sm text-xs md:text-sm font-bold tracking-[0.25em] uppercase text-white group cursor-pointer relative overflow-hidden">
+                        <span class="relative z-10 mr-3">You're Invited</span>
+                        <i data-lucide="linkedin" class="w-4 h-4 relative z-10 text-white group-hover:text-yellow-400 transition-colors"></i>
+                        <span class="ml-3 relative z-10 text-[10px] opacity-70 group-hover:opacity-100 transition-opacity">Confirm Attendance</span>
+                    </a>
+                </div>
 
             </div>
         </div>
 
-        <div class="flex flex-col items-center justify-end pb-2 gap-2 opacity-90 z-10">
-            <div class="w-32 h-0.5 bg-gray-800 rounded-full overflow-hidden">
-                <div class="bg-gradient-to-r from-teal-500 to-yellow-500 h-full w-[49%]"></div>
+        <div class="flex flex-col items-center justify-end pb-4 gap-3 opacity-90 z-10 anim-entry delay-3">
+            <div class="w-64 h-1 bg-gray-800/50 rounded-full overflow-hidden border border-gray-700/50 backdrop-blur">
+                <div class="bg-gradient-to-r from-teal-500 via-cyan-400 to-yellow-500 h-full" style="width: 49%; animation: loadBar 3s infinite ease-in-out alternate;"></div>
             </div>
-            <div class="text-[9px] text-teal-500 hud-font tracking-[0.3em] font-bold uppercase">
-                System compiling... 49%
+            <div class="flex justify-between w-64 text-[9px] text-teal-500 hud-font tracking-[0.2em] font-bold uppercase">
+                <span>System compiling...</span>
+                <span><span id="load-pct">49</span>%</span>
             </div>
         </div>
 
     </div>
 
     <script>
-        // === 1. DUAL-LAYER QUANTUM ENGINE (CANVAS) ===
+        // === 1. HYPER-DRIVE CANVAS ENGINE ===
         const canvas = document.getElementById('quantum-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
+        let mouseX = 0;
+        let mouseY = 0;
         
         function resize() {
             width = window.innerWidth;
@@ -253,43 +292,54 @@
             canvas.height = height;
         }
         window.addEventListener('resize', resize);
+        
+        // Mouse tracking for parallax
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - width / 2) * 0.5;
+            mouseY = (e.clientY - height / 2) * 0.5;
+        });
+
         resize();
 
         class Particle {
             constructor(type) {
-                this.type = type; // 'warp' or 'dust'
+                this.type = type; // 'star', 'grid', 'dust'
                 this.init();
             }
 
             init() {
-                if (this.type === 'warp') {
-                    // Fast lines (Stars)
-                    this.x = (Math.random() - 0.5) * width * 2;
-                    this.y = (Math.random() - 0.5) * height * 2;
+                if (this.type === 'star') {
+                    this.x = (Math.random() - 0.5) * width * 3;
+                    this.y = (Math.random() - 0.5) * height * 3;
                     this.z = Math.random() * width;
                     this.pz = this.z;
-                    this.speed = 15;
-                    this.color = Math.random() > 0.8 ? '#facc15' : '#14b8a6'; // Yellow or Teal
+                    this.color = Math.random() > 0.85 ? '#facc15' : '#2dd4bf';
                 } else {
-                    // Slow floating dust (Quantum Particles)
+                    // Floating dust
                     this.x = Math.random() * width;
                     this.y = Math.random() * height;
-                    this.z = Math.random() * width;
                     this.size = Math.random() * 2;
-                    this.vx = (Math.random() - 0.5) * 0.5;
-                    this.vy = (Math.random() - 0.5) * 0.5;
-                    this.color = Math.random() > 0.5 ? 'rgba(20, 184, 166, 0.6)' : 'rgba(250, 204, 21, 0.6)';
+                    this.vx = (Math.random() - 0.5) * 0.2;
+                    this.vy = (Math.random() - 0.5) * 0.2;
+                    this.alpha = Math.random() * 0.5;
                 }
             }
 
-            update() {
-                if (this.type === 'warp') {
-                    this.z -= this.speed;
-                    if (this.z < 1) { this.init(); this.z = width; this.pz = this.z; }
+            update(speed) {
+                if (this.type === 'star') {
+                    this.z -= speed;
+                    // Parallax shift
+                    let shiftX = (mouseX * 0.05) * (width/this.z);
+                    let shiftY = (mouseY * 0.05) * (width/this.z);
+                    
+                    if (this.z < 1) { 
+                        this.init(); 
+                        this.z = width; 
+                        this.pz = this.z; 
+                    }
                 } else {
                     this.x += this.vx;
                     this.y += this.vy;
-                    // Wrap around screen
                     if(this.x < 0) this.x = width;
                     if(this.x > width) this.x = 0;
                     if(this.y < 0) this.y = height;
@@ -298,45 +348,98 @@
             }
 
             draw() {
-                if (this.type === 'warp') {
+                if (this.type === 'star') {
                     let sx = (this.x / this.z) * width + width/2;
                     let sy = (this.y / this.z) * height + height/2;
-                    let px = (this.x / this.pz) * width + width/2;
-                    let py = (this.y / this.pz) * height + height/2;
+                    
+                    // Add mouse parallax influence
+                    sx += (mouseX * 0.02);
+                    sy += (mouseY * 0.02);
+
+                    let px = (this.x / this.pz) * width + width/2 + (mouseX * 0.02);
+                    let py = (this.y / this.pz) * height + height/2 + (mouseY * 0.02);
+                    
                     this.pz = this.z;
+
                     if (sx < 0 || sx > width || sy < 0 || sy > height) return;
-                    const alpha = 1 - (this.z / width);
+
+                    const size = (1 - this.z / width) * 2;
+                    const alpha = (1 - this.z / width);
+                    
                     ctx.beginPath();
                     ctx.moveTo(px, py);
                     ctx.lineTo(sx, sy);
                     ctx.strokeStyle = this.color;
-                    ctx.lineWidth = (1 - this.z / width) * 2;
+                    ctx.lineWidth = size;
                     ctx.globalAlpha = alpha;
                     ctx.stroke();
+                    ctx.globalAlpha = 1;
+
                 } else {
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.globalAlpha = 0.8;
+                    ctx.fillStyle = 'white';
+                    ctx.globalAlpha = this.alpha;
                     ctx.fill();
+                    ctx.globalAlpha = 1;
                 }
             }
         }
 
-        // Initialize Dual Particles
-        const isMobile = window.innerWidth < 768;
-        const warpCount = isMobile ? 80 : 250;
-        const dustCount = isMobile ? 30 : 80;
-
-        for(let i=0; i<warpCount; i++) particles.push(new Particle('warp'));
+        const starCount = window.innerWidth < 768 ? 100 : 400;
+        const dustCount = 50;
+        
+        for(let i=0; i<starCount; i++) particles.push(new Particle('star'));
         for(let i=0; i<dustCount; i++) particles.push(new Particle('dust'));
 
-        function animate() {
-            ctx.fillStyle = 'rgba(2, 6, 23, 0.3)'; // Trail effect
-            ctx.fillRect(0, 0, width, height);
+        // Grid parameters
+        let gridY = 0;
+
+        function drawGrid() {
+            // Retro-wave style perspective grid at the bottom
+            ctx.strokeStyle = 'rgba(20, 184, 166, 0.15)';
+            ctx.lineWidth = 1;
             
+            const horizon = height * 0.6; // Horizon line
+            
+            // Vertical lines (perspective)
+            for(let i = -width; i < width * 2; i += 80) {
+                // Parallax shift for grid
+                let x = i + (mouseX * 0.1);
+                
+                ctx.beginPath();
+                ctx.moveTo(x, height);
+                // Converge to center
+                ctx.lineTo(width/2 + (x - width/2)*0.1, horizon); 
+                ctx.stroke();
+            }
+
+            // Horizontal moving lines
+            gridY = (gridY + 0.5) % 40;
+            for(let i = 0; i < height - horizon; i+=40) {
+                let y = horizon + i + gridY;
+                // Fade out near horizon
+                let alpha = (y - horizon) / (height - horizon); 
+                ctx.strokeStyle = `rgba(20, 184, 166, ${alpha * 0.3})`;
+                
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        }
+
+        function animate() {
+            // Clear with slight trail
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.4)';
+            ctx.fillRect(0, 0, width, height);
+
+            drawGrid();
+
+            let speed = 20; // Warp speed
+
             particles.forEach(p => {
-                p.update();
+                p.update(speed);
                 p.draw();
             });
             requestAnimationFrame(animate);
@@ -344,9 +447,34 @@
         animate();
 
 
-        // === 2. DATA SIMULATION ===
-        
-        // Random Fluctuation Helpers
+        // === 2. 3D HOLOGRAPHIC TILT ===
+        const mainCard = document.getElementById('main-card');
+        const container = document.body;
+
+        container.addEventListener('mousemove', (e) => {
+            if(window.innerWidth < 768) return; // Disable intense tilt on mobile
+            
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 40; 
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+            
+            // Rotation + subtle translation for depth
+            mainCard.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg) translateZ(10px)`;
+        });
+
+        container.addEventListener('mouseleave', () => {
+            mainCard.style.transform = `rotateY(0deg) rotateX(0deg) translateZ(0px)`;
+        });
+
+        // Mobile Gyroscope support (optional/progressive enhancement)
+        window.addEventListener('deviceorientation', (e) => {
+            if(window.innerWidth >= 768) return;
+            const y = e.gamma / 4; // Left/Right
+            const x = e.beta / 4;  // Front/Back
+            mainCard.style.transform = `rotateY(${y}deg) rotateX(${x}deg)`;
+        });
+
+
+        // === 3. DATA SIMULATION (UNCHANGED LOGIC) ===
         function fluctuate(id, min, max, fixed) {
             const el = document.getElementById(id);
             if(el) el.innerText = (Math.random() * (max - min) + min).toFixed(fixed);
@@ -356,6 +484,9 @@
         setInterval(() => { fluctuate('d-temp', 60, 75, 0); }, 1000);
         setInterval(() => { fluctuate('d-pack', 3000, 5000, 0); }, 100);
         setInterval(() => { fluctuate('d-lat', 8, 24, 0); }, 500);
+
+        // Compile bar number
+        setInterval(() => { fluctuate('load-pct', 49, 62, 0); }, 800);
 
         // Status Sequence
         const messages = ["Data receiving...", "Encrypting...", "Analysing...", "Done"];
