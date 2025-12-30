@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>270 KM/H | PROTOTYPE SPEC</title>
+    <title>270 KM/H | LIVE TELEMETRY</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,13 +11,11 @@
 
     <style>
         :root {
-            /* === YOUR REQUESTED PALETTE === */
             --neon-teal: #14b8a6; 
-            --neon-cyan: #2dd4bf; 
             --neon-yellow: #facc15; 
             --void-bg: #020617;    
-            --panel-bg: rgba(15, 23, 42, 0.6);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --glass: rgba(10, 20, 35, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -25,349 +23,404 @@
             color: white;
             font-family: 'Rajdhani', sans-serif;
             overflow-x: hidden;
+            /* Technical Grid Background */
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.15), transparent 70%),
-                linear-gradient(rgba(2, 6, 23, 1), rgba(2, 6, 23, 0.9));
+                linear-gradient(rgba(20, 184, 166, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 184, 166, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
-        /* === 1. COMPLEX BACKGROUNDS === */
-        .tech-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image: 
-                linear-gradient(rgba(20, 184, 166, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(20, 184, 166, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+        /* === BENTO GRID SYSTEM === */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        /* === 2. UI ELEMENTS === */
-        .bento-card {
-            background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        
-        /* Hover Effect: Yellow Glow */
-        .bento-card:hover {
-            border-color: var(--neon-yellow);
-            box-shadow: 0 0 20px rgba(250, 204, 21, 0.1);
+
+        .card:hover {
+            border-color: var(--neon-teal);
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.15);
             transform: translateY(-2px);
         }
 
-        /* Decorative Corners */
-        .corner-accent {
-            position: absolute; width: 8px; height: 8px;
-            transition: 0.3s;
+        /* Corner Brackets */
+        .corner {
+            position: absolute; width: 10px; height: 10px;
+            border: 2px solid transparent; transition: 0.3s;
         }
-        .c-tl { top: 0; left: 0; border-top: 2px solid var(--neon-teal); border-left: 2px solid var(--neon-teal); }
-        .c-tr { top: 0; right: 0; border-top: 2px solid var(--neon-teal); border-right: 2px solid var(--neon-teal); }
-        .c-bl { bottom: 0; left: 0; border-bottom: 2px solid var(--neon-yellow); border-left: 2px solid var(--neon-yellow); }
-        .c-br { bottom: 0; right: 0; border-bottom: 2px solid var(--neon-yellow); border-right: 2px solid var(--neon-yellow); }
-
-        .bento-card:hover .c-tl, .bento-card:hover .c-tr { width: 20px; height: 20px; }
-        .bento-card:hover .c-bl, .bento-card:hover .c-br { width: 20px; height: 20px; }
+        .c-tl { top: 0; left: 0; border-top-color: var(--neon-teal); border-left-color: var(--neon-teal); }
+        .c-tr { top: 0; right: 0; border-top-color: var(--neon-yellow); border-right-color: var(--neon-yellow); }
+        .c-bl { bottom: 0; left: 0; border-bottom-color: var(--neon-yellow); border-left-color: var(--neon-yellow); }
+        .c-br { bottom: 0; right: 0; border-bottom-color: var(--neon-teal); border-right-color: var(--neon-teal); }
+        
+        .card:hover .corner { width: 100%; height: 100%; opacity: 0.1; }
 
         /* Typography */
         .font-hud { font-family: 'Share Tech Mono', monospace; }
         .font-race { font-family: 'Orbitron', sans-serif; }
+
+        /* Animations */
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .blink { animation: blink 2s infinite; }
+
+        /* Scrollbar for Terminal */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-teal); }
+
+        /* Map Animation */
+        .map-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 5s linear infinite;
+        }
+        @keyframes dash { to { stroke-dashoffset: 0; } }
         
-        .text-gradient {
-            background: linear-gradient(135deg, #fff 40%, var(--neon-yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .map-dot {
+            offset-path: path("M10,80 C 40,10 65,10 95,80 S 150,150 180,80");
+            offset-distance: 0%;
+            animation: moveDot 5s linear infinite;
         }
+        @keyframes moveDot { 100% { offset-distance: 100%; } }
 
-        /* === 3. ANIMATIONS === */
-        @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
-        .scan-overlay {
-            position: absolute; inset: 0; pointer-events: none;
-            background: linear-gradient(to bottom, transparent, rgba(20, 184, 166, 0.1), transparent);
-            height: 100%; animation: scanline 3s linear infinite;
-        }
-
-        /* Marquee Animation */
-        .marquee-container { overflow: hidden; white-space: nowrap; position: relative; }
-        .marquee-content { display: inline-block; animation: marquee 20s linear infinite; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        /* Image Placeholder Pattern */
-        .placeholder-grid {
-            background-image: radial-gradient(var(--neon-teal) 1px, transparent 1px);
-            background-size: 20px 20px; opacity: 0.2;
-        }
     </style>
 </head>
-<body class="selection:bg-yellow-400 selection:text-black">
+<body class="pt-24 pb-12">
 
-    <div class="tech-grid"></div>
-    <canvas id="spark-canvas" class="fixed inset-0 z-0 opacity-40 pointer-events-none"></canvas>
-
-    <nav class="fixed top-0 w-full z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-            <div class="flex items-center gap-3 group cursor-pointer">
-                <div class="w-10 h-10 border border-teal-500 flex items-center justify-center bg-teal-500/10 group-hover:bg-teal-500/20 transition-all transform group-hover:rotate-45">
-                    <span class="font-race font-bold text-yellow-400 text-lg">2</span>
+    <nav class="fixed top-0 w-full z-50 border-b border-white/5 bg-slate-950/90 backdrop-blur-md h-20">
+        <div class="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="relative w-10 h-10 bg-gradient-to-br from-teal-500 to-transparent border border-white/20 flex items-center justify-center transform skew-x-[-10deg]">
+                    <span class="font-race font-bold text-yellow-400 text-sm transform skew-x-[10deg]">MK.X</span>
                 </div>
-                <div class="flex flex-col">
-                    <span class="font-race font-bold text-xl tracking-wider text-white">270 <span class="text-yellow-400">KM/H</span></span>
-                    <span class="text-[9px] font-hud text-teal-400 tracking-[0.3em] uppercase">Prototype Div.</span>
+                <div class="flex flex-col leading-none">
+                    <span class="font-race font-black text-2xl tracking-tighter text-white">270 <span class="text-yellow-400">KM/H</span></span>
+                    <span class="text-[9px] font-hud text-gray-400 tracking-[0.4em] uppercase">Aerodynamics Div.</span>
                 </div>
             </div>
-
-            <div class="hidden md:flex items-center gap-8">
-                <a href="#" class="text-xs font-bold uppercase tracking-widest hover:text-yellow-400 transition-colors">Telemetry</a>
-                <a href="#" class="text-xs font-bold uppercase tracking-widest hover:text-yellow-400 transition-colors">Engineering</a>
-                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="px-6 py-2 border border-yellow-400/50 text-yellow-400 text-xs font-bold uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-all">
-                    Access Data
+            
+            <div class="flex gap-6">
+                <div class="flex flex-col text-right hidden md:block">
+                    <span class="text-[10px] text-teal-400 font-hud">SERVER TIME</span>
+                    <span id="clock" class="text-xs text-white font-hud">00:00:00:00</span>
+                </div>
+                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="px-5 py-2 bg-yellow-400/10 border border-yellow-400/50 text-yellow-400 text-xs font-bold uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-all flex items-center gap-2">
+                    <i data-lucide="power" class="w-3 h-3"></i> Initialize
                 </a>
             </div>
         </div>
     </nav>
 
-    <main class="relative z-10 pt-28 pb-20 px-4 md:px-6 max-w-7xl mx-auto flex flex-col gap-6">
+    <div class="bento-grid">
 
-        <div class="bento-card rounded-2xl p-8 md:p-12 relative overflow-hidden group">
-            <div class="scan-overlay"></div>
-            <div class="corner-accent c-tl"></div><div class="corner-accent c-tr"></div>
-            <div class="corner-accent c-bl"></div><div class="corner-accent c-br"></div>
-
-            <div class="relative z-10 flex flex-col md:flex-row justify-between items-end gap-8">
-                <div class="max-w-2xl">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-2 h-2 bg-yellow-400 animate-pulse rounded-full"></div>
-                        <span class="font-hud text-teal-400 text-xs tracking-widest">SYSTEM ONLINE</span>
-                    </div>
-                    <h1 class="text-6xl md:text-8xl font-race font-black italic tracking-tighter text-white mb-2 leading-none">
-                        BEYOND <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-yellow-400">PHYSICS</span>
-                    </h1>
-                    <p class="text-gray-400 font-rajdhani text-lg mt-4 max-w-lg border-l-2 border-teal-500 pl-4">
-                        The MK.XI platform redefines aerodynamic efficiency. Data-driven speed projected for 2026.
-                    </p>
+        <div class="card col-span-12 md:col-span-8 h-[400px] flex flex-col relative">
+            <div class="corner c-tl"></div><div class="corner c-tr"></div>
+            <div class="corner c-bl"></div><div class="corner c-br"></div>
+            
+            <div class="absolute top-4 left-6 z-10">
+                <h2 class="text-3xl font-race text-white uppercase italic">Active Aero<span class="text-yellow-400">dynamics</span></h2>
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="w-2 h-2 bg-green-500 rounded-full blink"></div>
+                    <span class="font-hud text-xs text-teal-400 tracking-widest">WIND TUNNEL: ONLINE</span>
                 </div>
+            </div>
 
-                <div class="relative w-32 h-32 md:w-40 md:h-40 flex items-center justify-center border-4 border-gray-800 rounded-full">
-                    <div class="absolute inset-0 border-4 border-t-teal-500 border-r-yellow-400 rounded-full animate-spin duration-[3s]"></div>
-                    <div class="text-center">
-                        <span class="block text-3xl font-bold font-race text-white">270</span>
-                        <span class="text-[10px] text-gray-500 uppercase tracking-widest">KM/H Target</span>
-                    </div>
+            <canvas id="wind-tunnel" class="absolute inset-0 w-full h-full z-0"></canvas>
+            
+            <div class="absolute bottom-4 right-6 z-10 text-right">
+                <div class="text-4xl font-race font-bold text-white opacity-80">0.21 <span class="text-sm text-gray-400">Cd</span></div>
+                <div class="text-[10px] font-hud text-gray-500">DRAG COEFFICIENT</div>
+            </div>
+        </div>
+
+        <div class="card col-span-12 md:col-span-4 h-[400px] p-6 flex flex-col items-center justify-center relative" id="g-card">
+            <h3 class="absolute top-4 left-6 text-sm font-race text-gray-400 uppercase tracking-widest">G-Force</h3>
+            
+            <div class="w-48 h-48 rounded-full border border-white/10 relative flex items-center justify-center bg-black/20">
+                <div class="absolute w-32 h-32 rounded-full border border-teal-500/20"></div>
+                <div class="absolute w-16 h-16 rounded-full border border-teal-500/40"></div>
+                <div class="absolute w-full h-[1px] bg-teal-500/20"></div>
+                <div class="absolute h-full w-[1px] bg-teal-500/20"></div>
+                
+                <div id="g-dot" class="w-4 h-4 bg-yellow-400 rounded-full shadow-[0_0_15px_rgba(250,204,21,0.8)] transition-transform duration-100 ease-out"></div>
+            </div>
+
+            <div class="mt-8 grid grid-cols-2 gap-8 text-center w-full">
+                <div>
+                    <span class="block text-2xl font-hud text-white font-bold" id="g-lat">0.00</span>
+                    <span class="text-[9px] text-teal-500 uppercase">Lateral G</span>
+                </div>
+                <div>
+                    <span class="block text-2xl font-hud text-white font-bold" id="g-long">0.00</span>
+                    <span class="text-[9px] text-teal-500 uppercase">Longitudinal G</span>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[500px]">
-
-            <div class="bento-card col-span-1 md:col-span-8 rounded-xl relative group h-64 md:h-auto flex items-center justify-center bg-black/40">
-                <div class="corner-accent c-tl"></div>
-                <div class="placeholder-grid absolute inset-0"></div>
-                
-                <div class="text-center z-10 relative">
-                    <i data-lucide="zap" class="w-12 h-12 text-yellow-400 mx-auto mb-4 opacity-80"></i>
-                    <h3 class="text-2xl font-race text-white uppercase tracking-widest">Aerodynamics Model</h3>
-                    <p class="font-hud text-teal-500 text-xs mt-2">RENDERING SIMULATION...</p>
-                </div>
-
-                <div class="absolute bottom-4 left-4 flex gap-4">
-                    <div class="bg-black/80 px-3 py-1 border border-teal-500/30 rounded text-[10px] font-hud text-white">
-                        DRAG_COEFF: 0.21
-                    </div>
-                    <div class="bg-black/80 px-3 py-1 border border-teal-500/30 rounded text-[10px] font-hud text-white">
-                        DOWNFORCE: 800KG
-                    </div>
-                </div>
+        <div class="card col-span-12 md:col-span-4 h-[250px] p-4 font-hud text-xs flex flex-col">
+            <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
+                <span class="text-yellow-400 uppercase tracking-widest">System_Log</span>
+                <i data-lucide="terminal" class="w-3 h-3 text-gray-500"></i>
             </div>
-
-            <div class="bento-card col-span-1 md:col-span-4 rounded-xl p-4 flex flex-col justify-between">
-                <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
-                    <span class="text-xs font-bold text-teal-400 uppercase tracking-wider">Engine Telemetry</span>
-                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+            <div id="terminal-output" class="flex-grow overflow-y-hidden text-gray-300 leading-relaxed font-mono opacity-80">
                 </div>
-                
-                <div class="relative flex-grow bg-black/50 border border-white/5 rounded mb-2 overflow-hidden">
-                    <canvas id="graph-canvas" class="w-full h-full"></canvas>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="bg-white/5 p-2 rounded border-l-2 border-yellow-400">
-                        <div class="text-[9px] text-gray-400 uppercase">RPM</div>
-                        <div class="text-lg font-hud font-bold text-white" id="val-rpm">8,400</div>
-                    </div>
-                    <div class="bg-white/5 p-2 rounded border-l-2 border-teal-400">
-                        <div class="text-[9px] text-gray-400 uppercase">Load</div>
-                        <div class="text-lg font-hud font-bold text-white">92%</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bento-card col-span-1 md:col-span-4 rounded-xl p-4 relative overflow-hidden">
-                <div class="absolute inset-0 opacity-20" style="background-image: repeating-linear-gradient(45deg, #14b8a6 0, #14b8a6 1px, transparent 0, transparent 50%); background-size: 10px 10px;"></div>
-                
-                <div class="relative z-10 h-full flex flex-col justify-center items-center text-center">
-                    <div class="w-full h-32 border border-teal-500/30 rounded flex items-center justify-center relative">
-                        <svg class="w-full h-full p-4" viewBox="0 0 100 50">
-                            <path d="M10,40 Q30,10 50,25 T90,10" fill="none" stroke="#facc15" stroke-width="2" class="path-anim"/>
-                            <circle cx="90" cy="10" r="3" fill="#14b8a6" class="animate-ping"/>
-                        </svg>
-                    </div>
-                    <h4 class="mt-4 text-sm font-bold text-white uppercase tracking-widest">Track Localisation</h4>
-                    <p class="text-[10px] text-gray-400 mt-1">SECTOR 4 - OPTIMIZED</p>
-                </div>
-            </div>
-
-            <div class="bento-card col-span-1 md:col-span-4 rounded-xl p-6 flex flex-col justify-center">
-                <h3 class="text-lg font-race text-white mb-4 border-b border-white/10 pb-2">Technical Data</h3>
-                <ul class="space-y-3">
-                    <li class="flex justify-between items-center text-sm">
-                        <span class="text-gray-400">Chassis</span>
-                        <span class="font-hud font-bold text-teal-400">Carbon-Fiber Mono</span>
-                    </li>
-                    <li class="flex justify-between items-center text-sm">
-                        <span class="text-gray-400">0-100 KM/H</span>
-                        <span class="font-hud font-bold text-yellow-400">2.1s</span>
-                    </li>
-                    <li class="flex justify-between items-center text-sm">
-                        <span class="text-gray-400">Power Unit</span>
-                        <span class="font-hud font-bold text-white">Hybrid V6</span>
-                    </li>
-                    <li class="flex justify-between items-center text-sm">
-                        <span class="text-gray-400">Weight</span>
-                        <span class="font-hud font-bold text-white">980kg</span>
-                    </li>
-                </ul>
-            </div>
-
-             <div class="bento-card col-span-1 md:col-span-4 rounded-xl p-6 flex items-center justify-center bg-gradient-to-br from-teal-900/40 to-black">
-                <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="group flex flex-col items-center gap-2">
-                    <div class="w-12 h-12 rounded-full border border-yellow-400 flex items-center justify-center group-hover:bg-yellow-400 transition-all">
-                        <i data-lucide="arrow-up-right" class="text-white group-hover:text-black"></i>
-                    </div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-white group-hover:text-yellow-400 transition-colors">Join The Project</span>
-                </a>
-            </div>
-
         </div>
 
-        <div class="w-full border-y border-white/10 bg-black/30 py-4 marquee-container">
-            <div class="marquee-content font-race text-2xl font-bold text-gray-600 uppercase tracking-widest">
-                <span class="mx-8">Aerodynamics</span> • <span class="mx-8 text-teal-800">Telemetry</span> • <span class="mx-8">Speed</span> • <span class="mx-8 text-yellow-800">Innovation</span> • <span class="mx-8">270 KM/H</span> • <span class="mx-8">Future</span> • <span class="mx-8 text-teal-800">Performance</span> •
-                <span class="mx-8">Aerodynamics</span> • <span class="mx-8 text-teal-800">Telemetry</span> • <span class="mx-8">Speed</span> • <span class="mx-8 text-yellow-800">Innovation</span> • <span class="mx-8">270 KM/H</span> • <span class="mx-8">Future</span> • <span class="mx-8 text-teal-800">Performance</span> •
+        <div class="card col-span-12 md:col-span-4 h-[250px] relative bg-slate-900/50">
+            <div class="absolute top-4 left-4 z-10">
+                <span class="text-[10px] font-race text-teal-400 uppercase tracking-widest">GPS Tracking</span>
+            </div>
+            
+            <svg class="w-full h-full p-8" viewBox="0 0 200 160">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgb(20,184,166);stop-opacity:0" />
+                        <stop offset="50%" style="stop-color:rgb(20,184,166);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgb(20,184,166);stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+                <path d="M10,80 C 40,10 65,10 95,80 S 150,150 180,80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4" />
+                <path class="map-path" d="M10,80 C 40,10 65,10 95,80 S 150,150 180,80" fill="none" stroke="url(#grad1)" stroke-width="2" />
+                
+                <circle class="map-dot" r="4" fill="#facc15">
+                    <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite" />
+                </circle>
+            </svg>
+
+            <div class="absolute bottom-4 right-4 text-right">
+                <span class="block text-white font-hud text-lg">Sector 3</span>
+                <span class="text-[9px] text-gray-500">OPTIMIZING TRAJECTORY</span>
             </div>
         </div>
 
-    </main>
+        <div class="card col-span-12 md:col-span-4 h-[250px] p-4 flex flex-col">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[10px] font-race text-teal-400 uppercase tracking-widest">Power Output</span>
+                <span class="text-white font-hud font-bold" id="rpm-val">0 RPM</span>
+            </div>
+            <div class="relative flex-grow bg-black/20 rounded border border-white/5 overflow-hidden">
+                <canvas id="graph-canvas" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
+    </div>
 
     <script>
-        // === 1. SPARK PARTICLE SYSTEM (Background) ===
-        const sparkCanvas = document.getElementById('spark-canvas');
-        const sCtx = sparkCanvas.getContext('2d');
-        let sWidth, sHeight;
+        // === 1. WIND TUNNEL SIMULATION (Canvas) ===
+        // This simulates air particles hitting an invisible car shape
+        const wCanvas = document.getElementById('wind-tunnel');
+        const wCtx = wCanvas.getContext('2d');
+        let wW, wH;
 
-        function resizeSparks() {
-            sWidth = window.innerWidth;
-            sHeight = window.innerHeight;
-            sparkCanvas.width = sWidth;
-            sparkCanvas.height = sHeight;
+        function resizeWind() {
+            wW = wCanvas.parentElement.offsetWidth;
+            wH = wCanvas.parentElement.offsetHeight;
+            wCanvas.width = wW;
+            wCanvas.height = wH;
         }
-        window.addEventListener('resize', resizeSparks);
-        resizeSparks();
+        window.addEventListener('resize', resizeWind);
+        resizeWind();
 
-        class Spark {
+        class Particle {
             constructor() {
-                this.init();
+                this.reset();
             }
-            init() {
-                this.x = Math.random() * sWidth;
-                this.y = sHeight + Math.random() * 100;
-                this.speed = Math.random() * 3 + 1;
-                this.size = Math.random() * 2;
-                this.color = Math.random() > 0.5 ? '#14b8a6' : '#facc15'; // Teal or Yellow
+            reset() {
+                this.x = Math.random() * -100; // Start off screen left
+                this.y = Math.random() * wH;
+                this.speed = Math.random() * 5 + 8; // Fast speed
+                this.size = Math.random() * 1.5;
+                this.alpha = Math.random() * 0.5 + 0.1;
             }
             update() {
-                this.y -= this.speed;
-                if(this.y < -10) this.init();
+                this.x += this.speed;
+                
+                // THE INVISIBLE CAR SHAPE LOGIC
+                // Define a curve in the middle of screen
+                const carStart = wW * 0.3;
+                const carEnd = wW * 0.7;
+                const ground = wH * 0.8;
+                
+                // If particle enters the "car zone"
+                if (this.x > carStart && this.x < carEnd) {
+                    // Simple curve math to simulate hood/roof
+                    if (this.y > ground - 60) {
+                        this.y -= 2; // Deflect up (aerodynamics)
+                        this.speed += 0.1; // Speed up over the curve
+                    }
+                }
+
+                if (this.x > wW) this.reset();
             }
             draw() {
-                sCtx.fillStyle = this.color;
-                sCtx.fillRect(this.x, this.y, this.size, this.size * 3); // Rectangles look more "digital"
+                wCtx.fillStyle = `rgba(20, 184, 166, ${this.alpha})`; // Teal
+                wCtx.fillRect(this.x, this.y, this.size * 10, this.size); // Stretch for speed effect
             }
         }
 
-        const sparks = Array(100).fill().map(() => new Spark());
+        const particles = Array(150).fill().map(() => new Particle());
 
-        function animateSparks() {
-            sCtx.clearRect(0, 0, sWidth, sHeight);
-            sparks.forEach(s => { s.update(); s.draw(); });
-            requestAnimationFrame(animateSparks);
-        }
-        animateSparks();
-
-        // === 2. TELEMETRY GRAPH SIMULATION (Card B) ===
-        const graphCanvas = document.getElementById('graph-canvas');
-        const gCtx = graphCanvas.getContext('2d');
-        let gWidth = graphCanvas.offsetWidth;
-        let gHeight = graphCanvas.offsetHeight;
-        
-        // Handle canvas resolution
-        graphCanvas.width = gWidth;
-        graphCanvas.height = gHeight;
-
-        let points = [];
-        const maxPoints = 50;
-        
-        // Fill initial array
-        for(let i=0; i<maxPoints; i++) points.push(gHeight/2);
-
-        function updateGraph() {
-            // Shift points left
-            points.shift();
-            // Add new random point based on previous
-            let last = points[points.length-1];
-            let next = last + (Math.random() - 0.5) * 20;
-            // Clamp
-            if(next < 10) next = 10;
-            if(next > gHeight - 10) next = gHeight - 10;
-            points.push(next);
-
-            // Draw
-            gCtx.clearRect(0, 0, gWidth, gHeight);
+        function animateWind() {
+            wCtx.clearRect(0, 0, wW, wH);
             
-            // Grid lines
-            gCtx.strokeStyle = 'rgba(255,255,255,0.1)';
-            gCtx.beginPath();
-            gCtx.moveTo(0, gHeight/2); gCtx.lineTo(gWidth, gHeight/2);
-            gCtx.stroke();
+            // Draw Car Silhouette (Subtle)
+            wCtx.beginPath();
+            wCtx.moveTo(wW*0.25, wH*0.8);
+            wCtx.bezierCurveTo(wW*0.3, wH*0.6, wW*0.4, wH*0.5, wW*0.5, wH*0.5); // Roof
+            wCtx.bezierCurveTo(wW*0.6, wH*0.5, wW*0.7, wH*0.6, wW*0.75, wH*0.8); // Rear
+            wCtx.lineTo(wW*0.25, wH*0.8);
+            wCtx.fillStyle = 'rgba(0,0,0,0.3)';
+            wCtx.fill();
+            wCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+            wCtx.stroke();
 
-            // The Line
-            gCtx.strokeStyle = '#14b8a6'; // Teal
-            gCtx.lineWidth = 2;
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateWind);
+        }
+        animateWind();
+
+
+        // === 2. G-FORCE METER (Mouse Interaction) ===
+        const gCard = document.getElementById('g-card');
+        const gDot = document.getElementById('g-dot');
+        const gLat = document.getElementById('g-lat');
+        const gLong = document.getElementById('g-long');
+
+        gCard.addEventListener('mousemove', (e) => {
+            const rect = gCard.getBoundingClientRect();
+            const x = e.clientX - rect.left; // x position within the element.
+            const y = e.clientY - rect.top;  // y position within the element.
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Calculate distance from center (clamped)
+            let deltaX = (x - centerX) / 4; 
+            let deltaY = (y - centerY) / 4;
+            
+            // Limit movement to circle radius approx
+            const limit = 45; 
+            if (deltaX > limit) deltaX = limit; if (deltaX < -limit) deltaX = -limit;
+            if (deltaY > limit) deltaY = limit; if (deltaY < -limit) deltaY = -limit;
+
+            gDot.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            
+            // Update Numbers
+            gLat.innerText = (deltaX / 20).toFixed(2);
+            gLong.innerText = (deltaY / -20).toFixed(2); // Invert Y for G-force logic (up is brake/accel)
+        });
+
+        gCard.addEventListener('mouseleave', () => {
+            gDot.style.transform = `translate(0px, 0px)`;
+            gLat.innerText = "0.00";
+            gLong.innerText = "0.00";
+        });
+
+
+        // === 3. TERMINAL SYSTEM LOG ===
+        const terminal = document.getElementById('terminal-output');
+        const logs = [
+            "Initialize Core System...",
+            "Checking Hydraulic Pressure...",
+            "OK: Pressure Stable at 2000psi",
+            "Connecting to Satellite uplink...",
+            "Encryption Key: AES-256 [VERIFIED]",
+            "Loading Aerodynamic Profile: MK.X",
+            "Sensors: 98% Efficiency",
+            "WARNING: Ambient Temp Rising",
+            "Optimizing Fuel Mixture...",
+            "Data Stream: ACTIVE",
+            "Tracking Sector 1...",
+            "Adjusting Rear Wing Angle: +2.5deg",
+            "System Sync Complete."
+        ];
+
+        let logIndex = 0;
+        
+        function addLog() {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            div.innerHTML = `<span class="text-teal-600">[${time}]</span> ${logs[Math.floor(Math.random() * logs.length)]}`;
+            terminal.appendChild(div);
+            
+            // Auto scroll to bottom
+            terminal.scrollTop = terminal.scrollHeight;
+            
+            // Keep DOM light
+            if(terminal.children.length > 8) terminal.removeChild(terminal.firstChild);
+        }
+        setInterval(addLog, 1500); // Add line every 1.5s
+
+
+        // === 4. CLOCK ===
+        setInterval(() => {
+            const now = new Date();
+            const str = now.getHours().toString().padStart(2,'0') + ":" + 
+                        now.getMinutes().toString().padStart(2,'0') + ":" + 
+                        now.getSeconds().toString().padStart(2,'0') + ":" + 
+                        Math.floor(now.getMilliseconds()/10).toString().padStart(2,'0');
+            document.getElementById('clock').innerText = str;
+        }, 50);
+
+        // === 5. RPM GRAPH (Canvas) ===
+        const gCanvas = document.getElementById('graph-canvas');
+        const gCtx = gCanvas.getContext('2d');
+        gCanvas.width = gCanvas.offsetWidth;
+        gCanvas.height = gCanvas.offsetHeight;
+        let dataPoints = new Array(50).fill(gCanvas.height);
+
+        function drawGraph() {
+            gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+            
+            // Shift data
+            dataPoints.shift();
+            // Generate noisy wave
+            const noise = Math.random() * 30 - 15;
+            const target = gCanvas.height / 2 + Math.sin(Date.now() / 500) * 30;
+            let val = target + noise;
+            dataPoints.push(val);
+
+            // Update text
+            const rpm = Math.floor(9000 - (val * 10)); // rough mapping
+            document.getElementById('rpm-val').innerText = rpm + " RPM";
+            document.getElementById('rpm-val').style.color = rpm > 8500 ? '#facc15' : 'white';
+
+            // Draw line
             gCtx.beginPath();
-            for(let i=0; i<points.length; i++) {
-                let x = (i / (maxPoints - 1)) * gWidth;
-                let y = points[i];
-                if(i===0) gCtx.moveTo(x, y);
-                else gCtx.lineTo(x, y);
+            gCtx.strokeStyle = '#facc15';
+            gCtx.lineWidth = 2;
+            for(let i=0; i<dataPoints.length; i++) {
+                const x = (i / (dataPoints.length - 1)) * gCanvas.width;
+                const y = dataPoints[i];
+                if(i===0) gCtx.moveTo(x,y);
+                else gCtx.lineTo(x,y);
             }
             gCtx.stroke();
-
-            // Area under line
-            gCtx.lineTo(gWidth, gHeight);
-            gCtx.lineTo(0, gHeight);
-            gCtx.fillStyle = 'rgba(20, 184, 166, 0.2)';
+            
+            // Fill
+            gCtx.lineTo(gCanvas.width, gCanvas.height);
+            gCtx.lineTo(0, gCanvas.height);
+            gCtx.fillStyle = 'rgba(250, 204, 21, 0.1)';
             gCtx.fill();
 
-            requestAnimationFrame(updateGraph);
+            requestAnimationFrame(drawGraph);
         }
-        updateGraph();
+        drawGraph();
 
-        // === 3. RANDOM DATA UPDATE ===
-        setInterval(() => {
-            const rpm = Math.floor(Math.random() * (8500 - 8200) + 8200);
-            document.getElementById('val-rpm').innerText = rpm.toLocaleString();
-        }, 100);
-
+        // Initialize Icons
         if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
 </body>
