@@ -62,7 +62,6 @@
             position: relative;
         }
         
-        /* === 3. TEXT GLITCH === */
         .hud-font { font-family: 'Share Tech Mono', monospace; }
         .race-font { font-family: 'Orbitron', sans-serif; }
 
@@ -81,7 +80,6 @@
         @keyframes glitch-1 { 0% { clip-path: inset(20% 0 80% 0); } 100% { clip-path: inset(80% 0 5% 0); } }
         @keyframes glitch-2 { 0% { clip-path: inset(10% 0 60% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
 
-        /* === 4. UI ELEMENTS === */
         .bracket { position: absolute; width: 15px; height: 15px; border: 2px solid var(--neon-cyan); transition: 0.3s; }
         .b-tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
         .b-tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; border-color: var(--neon-gold); }
@@ -102,23 +100,17 @@
         .data-label { font-size: 8px; color: #9ca3af; letter-spacing: 1px; }
         .data-val { font-size: 10px; font-weight: bold; font-family: 'Share Tech Mono', monospace; }
 
-        /* === 5. INVISIBLE YOUTUBE CONTAINER === */
+        /* === 3. HIDDEN YOUTUBE CONTAINER === */
+        /* We keep it 1x1 pixel so it's technically "visible" to the browser but invisible to the eye */
         #music-container {
-            position: fixed; top: -200%; left: 0; opacity: 0; pointer-events: none; z-index: -1;
+            position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; z-index: -1;
         }
     </style>
 </head>
 <body>
 
     <div id="music-container">
-        <iframe id="youtube-player" 
-                width="560" height="315" 
-                src="https://www.youtube.com/embed/yMiIrAxQhFA?autoplay=1&mute=0&controls=0&loop=1&playlist=yMiIrAxQhFA&enablejsapi=1" 
-                title="YouTube video player" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen>
-        </iframe>
+        <div id="player"></div>
     </div>
 
     <div class="scanlines"></div>
@@ -193,24 +185,59 @@
     </div>
 
     <script>
-        // === 1. AUDIO AUTOPLAY ENFORCER (YOUTUBE) ===
-        // Browsers block audio until the user interacts.
-        // This script attaches a "Play" command to the very first click/scroll/touch on the page.
-        
-        // Note: The YouTube iframe is set to 'autoplay=1', but if that fails, this listener catches it.
-        function forcePlay() {
-            // We can't strictly force the iframe via JS without the API, but
-            // usually, the interaction with the document allows the iframe to process.
-            // For a robust "music playing" confirmation, we simply ensure the user
-            // interacts with the page (which they will, to click the link).
-            document.removeEventListener('click', forcePlay);
-            document.removeEventListener('scroll', forcePlay);
+        // 1. Load YouTube IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 2. Create the player object
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '100',
+                width: '100',
+                videoId: 'wzZqLqKjB9Q', // GOTH - Sidewalks and Skeletons
+                playerVars: {
+                    'playsinline': 1,
+                    'autoplay': 1,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'wzZqLqKjB9Q'
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
         }
-        document.addEventListener('click', forcePlay);
-        document.addEventListener('scroll', forcePlay);
 
+        // 3. The API will call this function when the video player is ready.
+        function onPlayerReady(event) {
+            // Attempt 1: Direct Autoplay (Works on Desktop)
+            event.target.setVolume(100);
+            event.target.playVideo();
 
-        // === 2. DUAL-LAYER QUANTUM ENGINE (CANVAS) ===
+            // Attempt 2: The "Magic Touch" Fallback for Mobile
+            // We attach a one-time listener to the entire screen.
+            // As soon as the user touches ANYWHERE (scroll, zoom, tap), we force play.
+            function unlockMobileAudio() {
+                player.playVideo();
+                player.unMute();
+                player.setVolume(100);
+                
+                // Remove listeners so it doesn't fire again
+                document.removeEventListener('touchstart', unlockMobileAudio);
+                document.removeEventListener('click', unlockMobileAudio);
+                document.removeEventListener('scroll', unlockMobileAudio);
+            }
+
+            document.addEventListener('touchstart', unlockMobileAudio);
+            document.addEventListener('click', unlockMobileAudio);
+            document.addEventListener('scroll', unlockMobileAudio);
+        }
+    </script>
+
+    <script>
         const canvas = document.getElementById('quantum-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -230,7 +257,6 @@
                 this.type = type; 
                 this.init();
             }
-
             init() {
                 if (this.type === 'warp') {
                     this.x = (Math.random() - 0.5) * width * 2;
@@ -249,7 +275,6 @@
                     this.color = Math.random() > 0.5 ? 'rgba(20, 184, 166, 0.6)' : 'rgba(250, 204, 21, 0.6)';
                 }
             }
-
             update() {
                 if (this.type === 'warp') {
                     this.z -= this.speed;
@@ -260,7 +285,6 @@
                     if(this.y < 0) this.y = height; if(this.y > height) this.y = 0;
                 }
             }
-
             draw() {
                 if (this.type === 'warp') {
                     let sx = (this.x / this.z) * width + width/2;
@@ -283,7 +307,6 @@
         const isMobile = window.innerWidth < 768;
         const warpCount = isMobile ? 80 : 250;
         const dustCount = isMobile ? 30 : 80;
-
         for(let i=0; i<warpCount; i++) particles.push(new Particle('warp'));
         for(let i=0; i<dustCount; i++) particles.push(new Particle('dust'));
 
@@ -295,7 +318,6 @@
         }
         animate();
 
-        // === 3. DATA SIMULATION ===
         function fluctuate(id, min, max, fixed) {
             const el = document.getElementById(id);
             if(el) el.innerText = (Math.random() * (max - min) + min).toFixed(fixed);
