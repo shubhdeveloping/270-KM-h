@@ -125,47 +125,14 @@
         .data-label { font-size: 8px; color: #9ca3af; letter-spacing: 1px; }
         .data-val { font-size: 10px; font-weight: bold; font-family: 'Share Tech Mono', monospace; }
 
-        /* === 5. START OVERLAY (REQUIRED FOR AUDIO) === */
-        #start-overlay {
-            position: fixed; inset: 0; z-index: 9999;
-            background: #020617;
-            display: flex; flex-col; justify-content: center; align-items: center;
-            transition: opacity 0.8s ease-out;
-            cursor: pointer;
-        }
-        .start-btn {
-            border: 1px solid var(--neon-teal);
-            padding: 15px 40px;
-            color: var(--neon-teal);
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            font-size: 14px;
-            background: rgba(20, 184, 166, 0.1);
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-        .start-btn:hover { background: var(--neon-teal); color: black; box-shadow: 0 0 30px var(--neon-teal); }
-
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop>
+    <audio id="bg-music" autoplay loop>
         <source src="goth.mp3" type="audio/mpeg">
         <source src="goth.ogg" type="audio/ogg">
     </audio>
-
-    <div id="start-overlay">
-        <div class="flex flex-col items-center gap-4">
-            <div class="w-16 h-16 border border-teal-500 rounded-full flex items-center justify-center animate-pulse">
-                <i data-lucide="power" class="w-8 h-8 text-teal-400"></i>
-            </div>
-            <div class="start-btn">Initialize System</div>
-            <div class="text-[10px] text-gray-500 font-mono tracking-widest mt-2">CLICK ANYWHERE TO ENGAGE</div>
-        </div>
-    </div>
 
     <div class="scanlines"></div>
     <div class="corner-pulse cp-tl"></div>
@@ -278,27 +245,36 @@
     </div>
 
     <script>
-        // === 0. MUSIC ACTIVATION HANDLER ===
-        const overlay = document.getElementById('start-overlay');
+        // === 0. FORCE AUTOPLAY SCRIPT ===
         const audio = document.getElementById('bg-music');
-        
-        // Ensure volume is not too loud on start
-        audio.volume = 0.6; 
+        audio.volume = 0.6; // Set volume (0.0 to 1.0)
 
-        overlay.addEventListener('click', () => {
-            // Fade out overlay
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-            }, 800);
+        // ATTEMPT 1: Direct Autoplay
+        let playPromise = audio.play();
 
-            // Play Music
-            audio.play().then(() => {
-                console.log("System Audio Engaged");
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                // Autoplay started!
+                console.log("Audio started automatically.");
             }).catch(error => {
-                console.log("Audio Playback Failed:", error);
+                // Autoplay was prevented.
+                console.log("Autoplay blocked. Waiting for user interaction.");
+                
+                // ATTEMPT 2: Play on ANY interaction (Click, Scroll, Key)
+                // This makes it feel like autoplay because it starts on the very first click anywhere
+                const startAudio = () => {
+                    audio.play();
+                    // Remove listeners once played
+                    document.removeEventListener('click', startAudio);
+                    document.removeEventListener('keydown', startAudio);
+                    document.removeEventListener('touchstart', startAudio);
+                };
+
+                document.addEventListener('click', startAudio);
+                document.addEventListener('keydown', startAudio);
+                document.addEventListener('touchstart', startAudio);
             });
-        });
+        }
 
 
         // === 1. DUAL-LAYER QUANTUM ENGINE (CANVAS) ===
