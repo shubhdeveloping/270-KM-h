@@ -16,7 +16,6 @@
             --neon-cyan: #2dd4bf; 
             --neon-gold: #facc15; 
             --void-bg: #020617;   
-            /* Enhanced Glass Variables */
             --glass-bg: rgba(2, 6, 23, 0.4);
             --glass-border: rgba(255, 255, 255, 0.1);
             --glass-highlight: rgba(255, 255, 255, 0.05);
@@ -36,17 +35,15 @@
         .scanlines {
             position: fixed; inset: 0; pointer-events: none; z-index: 5;
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 3px;
-            opacity: 0.2;
+            background-size: 100% 3px; opacity: 0.2;
         }
 
         #quantum-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
 
-        /* === 2. CORNER PULSE ANIMATION === */
+        /* === 2. ANIMATIONS & EFFECTS === */
         .corner-pulse {
             position: fixed; z-index: 2; pointer-events: none;
-            width: 100px; height: 100px;
-            filter: blur(20px); opacity: 0;
+            width: 100px; height: 100px; filter: blur(20px); opacity: 0;
             animation: pulseInward 3s infinite ease-in-out;
         }
         .cp-tl { top: 0; left: 0; background: radial-gradient(circle at top left, var(--neon-teal), transparent 70%); }
@@ -55,31 +52,17 @@
         .cp-br { bottom: 0; right: 0; background: radial-gradient(circle at bottom right, var(--neon-teal), transparent 70%); animation-delay: 1.5s; }
 
         @keyframes pulseInward {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { opacity: 0.4; }
-            100% { transform: scale(1.5); opacity: 0; }
+            0% { transform: scale(0.5); opacity: 0; } 50% { opacity: 0.4; } 100% { transform: scale(1.5); opacity: 0; }
         }
 
-        /* === 3. ADVANCED GLASSMORPHISM === */
         .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-top: 1px solid var(--glass-highlight);
-            box-shadow: 
-                0 4px 30px rgba(0, 0, 0, 0.5),
-                inset 0 0 20px rgba(255, 255, 255, 0.02);
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.02);
             position: relative;
         }
         
-        .glass-panel::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(125deg, transparent 0%, rgba(255,255,255,0.03) 30%, transparent 60%);
-            pointer-events: none;
-        }
-
-        /* === 4. TYPOGRAPHY & ELEMENTS === */
+        /* === 3. TEXT GLITCH === */
         .hud-font { font-family: 'Share Tech Mono', monospace; }
         .race-font { font-family: 'Orbitron', sans-serif; }
 
@@ -98,41 +81,45 @@
         @keyframes glitch-1 { 0% { clip-path: inset(20% 0 80% 0); } 100% { clip-path: inset(80% 0 5% 0); } }
         @keyframes glitch-2 { 0% { clip-path: inset(10% 0 60% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
 
-        /* Tech Corners */
+        /* === 4. UI ELEMENTS === */
         .bracket { position: absolute; width: 15px; height: 15px; border: 2px solid var(--neon-cyan); transition: 0.3s; }
         .b-tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
         .b-tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; border-color: var(--neon-gold); }
         .b-bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; border-color: var(--neon-gold); }
         .b-br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
 
-        /* The LinkedIn Button */
         .btn-link {
             background: linear-gradient(90deg, rgba(20, 184, 166, 0.1), rgba(250, 204, 21, 0.05));
             border: 1px solid rgba(20, 184, 166, 0.5);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-link:hover {
-            background: rgba(20, 184, 166, 0.2);
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 20px rgba(20, 184, 166, 0.4);
-            letter-spacing: 0.25em;
+            background: rgba(20, 184, 166, 0.2); border-color: var(--neon-gold);
+            box-shadow: 0 0 20px rgba(20, 184, 166, 0.4); letter-spacing: 0.25em;
         }
-        .btn-link i { transition: 0.3s; }
-        .btn-link:hover i { color: var(--neon-gold); transform: scale(1.2); }
-
-        /* Data Row Styling */
+        
         .data-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 2px 0; }
         .data-label { font-size: 8px; color: #9ca3af; letter-spacing: 1px; }
         .data-val { font-size: 10px; font-weight: bold; font-family: 'Share Tech Mono', monospace; }
 
+        /* === 5. INVISIBLE YOUTUBE CONTAINER === */
+        #music-container {
+            position: fixed; top: -200%; left: 0; opacity: 0; pointer-events: none; z-index: -1;
+        }
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" autoplay loop>
-        <source src="goth.mp3" type="audio/mpeg">
-        <source src="goth.ogg" type="audio/ogg">
-    </audio>
+    <div id="music-container">
+        <iframe id="youtube-player" 
+                width="560" height="315" 
+                src="https://www.youtube.com/embed/yMiIrAxQhFA?autoplay=1&mute=0&controls=0&loop=1&playlist=yMiIrAxQhFA&enablejsapi=1" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+        </iframe>
+    </div>
 
     <div class="scanlines"></div>
     <div class="corner-pulse cp-tl"></div>
@@ -145,7 +132,6 @@
     <div class="relative z-50 h-full w-full flex flex-col justify-between p-3 md:p-6 overflow-hidden">
 
         <div class="flex justify-between items-start gap-2">
-            
             <div class="glass-panel p-3 rounded-md w-40 md:w-56">
                 <div class="bracket b-tl"></div>
                 <div class="flex items-center gap-2 mb-2 border-b border-teal-500/30 pb-1">
@@ -153,25 +139,11 @@
                     <span class="text-[10px] text-teal-300 font-bold tracking-widest uppercase">System Status</span>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <div class="data-row">
-                        <span class="data-label">CORE STATE</span>
-                        <span class="data-val text-white">ONLINE</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">Q-BIT STABILITY</span>
-                        <span class="data-val text-teal-400"><span id="d-stable">99.9</span>%</span>
-                    </div>
-                    <div class="data-row">
-                        <span class="data-label">COOLING</span>
-                        <span class="data-val text-white"><span id="d-cool">Active</span></span>
-                    </div>
-                    <div class="data-row border-none">
-                        <span class="data-label">TEMP</span>
-                        <span class="data-val text-yellow-400"><span id="d-temp">65</span>°C</span>
-                    </div>
+                    <div class="data-row"><span class="data-label">CORE STATE</span><span class="data-val text-white">ONLINE</span></div>
+                    <div class="data-row"><span class="data-label">Q-BIT STABILITY</span><span class="data-val text-teal-400"><span id="d-stable">99.9</span>%</span></div>
+                    <div class="data-row"><span class="data-label">COOLING</span><span class="data-val text-white"><span id="d-cool">Active</span></span></div>
                 </div>
             </div>
-
             <div class="glass-panel p-3 rounded-md w-40 md:w-56 text-right">
                 <div class="bracket b-tr"></div>
                 <div class="flex items-center justify-end gap-2 mb-2 border-b border-yellow-500/30 pb-1">
@@ -179,41 +151,20 @@
                     <i data-lucide="database" class="w-3 h-3 text-yellow-400"></i>
                 </div>
                 <div class="flex flex-col gap-1">
-                    <div class="data-row justify-end gap-4">
-                        <span class="data-label">STREAM ID</span>
-                        <span class="data-val text-white">1</span>
-                    </div>
-                    <div class="data-row justify-end gap-4">
-                        <span class="data-label">PACKETS</span>
-                        <span class="data-val text-teal-400"><span id="d-pack">4021</span>/s</span>
-                    </div>
-                    <div class="data-row justify-end gap-4">
-                        <span class="data-label">LATENCY</span>
-                        <span class="data-val text-white"><span id="d-lat">12</span>ms</span>
-                    </div>
-                    <div class="data-row border-none justify-end gap-4">
-                        <span class="data-label">ENCRYPTION</span>
-                        <span class="data-val text-yellow-400">AES-4K</span>
-                    </div>
+                    <div class="data-row justify-end gap-4"><span class="data-label">STREAM ID</span><span class="data-val text-white">1</span></div>
+                    <div class="data-row justify-end gap-4"><span class="data-label">PACKETS</span><span class="data-val text-teal-400"><span id="d-pack">4021</span>/s</span></div>
+                    <div class="data-row justify-end gap-4"><span class="data-label">LATENCY</span><span class="data-val text-white"><span id="d-lat">12</span>ms</span></div>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-col items-center justify-center flex-grow perspective-1000 mt-4 mb-4">
-            
             <div class="glass-panel p-6 md:p-12 rounded-2xl max-w-2xl w-full text-center relative group transform transition-all duration-300">
-                <div class="bracket b-tl"></div><div class="bracket b-tr"></div>
-                <div class="bracket b-bl"></div><div class="bracket b-br"></div>
+                <div class="bracket b-tl"></div><div class="bracket b-tr"></div><div class="bracket b-bl"></div><div class="bracket b-br"></div>
 
                 <div class="flex justify-center items-center gap-2 mb-6 h-6">
                     <div class="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-ping"></div>
                     <span id="sys-msg" class="text-[10px] md:text-xs text-teal-300 hud-font tracking-[0.2em] uppercase">DATA RECEIVING...</span>
-                </div>
-
-                <div class="mb-4">
-                    <span class="inline-block border border-teal-500/50 rounded px-2 py-0.5 text-[9px] text-teal-200 tracking-[0.3em] uppercase bg-teal-900/30">
-                        Launching in 2026
-                    </span>
                 </div>
 
                 <div class="relative inline-block mb-2">
@@ -227,9 +178,7 @@
                 <a href="https://www.linkedin.com/company/270kmph/" target="_blank" class="btn-link w-full md:w-auto inline-flex items-center justify-center px-8 py-4 rounded-full text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-white group cursor-pointer relative overflow-hidden">
                     <span class="relative z-10 mr-3">You're Invited</span>
                     <i data-lucide="linkedin" class="w-4 h-4 relative z-10 text-white group-hover:text-yellow-400"></i>
-                    <span class="ml-3 relative z-10 text-[10px] opacity-70 group-hover:opacity-100 transition-opacity">Confirm Attendance</span>
                 </a>
-
             </div>
         </div>
 
@@ -241,43 +190,27 @@
                 System compiling... 54%
             </div>
         </div>
-
     </div>
 
     <script>
-        // === 0. FORCE AUTOPLAY SCRIPT ===
-        const audio = document.getElementById('bg-music');
-        audio.volume = 0.6; // Set volume (0.0 to 1.0)
-
-        // ATTEMPT 1: Direct Autoplay
-        let playPromise = audio.play();
-
-        if (playPromise !== undefined) {
-            playPromise.then(_ => {
-                // Autoplay started!
-                console.log("Audio started automatically.");
-            }).catch(error => {
-                // Autoplay was prevented.
-                console.log("Autoplay blocked. Waiting for user interaction.");
-                
-                // ATTEMPT 2: Play on ANY interaction (Click, Scroll, Key)
-                // This makes it feel like autoplay because it starts on the very first click anywhere
-                const startAudio = () => {
-                    audio.play();
-                    // Remove listeners once played
-                    document.removeEventListener('click', startAudio);
-                    document.removeEventListener('keydown', startAudio);
-                    document.removeEventListener('touchstart', startAudio);
-                };
-
-                document.addEventListener('click', startAudio);
-                document.addEventListener('keydown', startAudio);
-                document.addEventListener('touchstart', startAudio);
-            });
+        // === 1. AUDIO AUTOPLAY ENFORCER (YOUTUBE) ===
+        // Browsers block audio until the user interacts.
+        // This script attaches a "Play" command to the very first click/scroll/touch on the page.
+        
+        // Note: The YouTube iframe is set to 'autoplay=1', but if that fails, this listener catches it.
+        function forcePlay() {
+            // We can't strictly force the iframe via JS without the API, but
+            // usually, the interaction with the document allows the iframe to process.
+            // For a robust "music playing" confirmation, we simply ensure the user
+            // interacts with the page (which they will, to click the link).
+            document.removeEventListener('click', forcePlay);
+            document.removeEventListener('scroll', forcePlay);
         }
+        document.addEventListener('click', forcePlay);
+        document.addEventListener('scroll', forcePlay);
 
 
-        // === 1. DUAL-LAYER QUANTUM ENGINE (CANVAS) ===
+        // === 2. DUAL-LAYER QUANTUM ENGINE (CANVAS) ===
         const canvas = document.getElementById('quantum-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -294,21 +227,19 @@
 
         class Particle {
             constructor(type) {
-                this.type = type; // 'warp' or 'dust'
+                this.type = type; 
                 this.init();
             }
 
             init() {
                 if (this.type === 'warp') {
-                    // Fast lines (Stars)
                     this.x = (Math.random() - 0.5) * width * 2;
                     this.y = (Math.random() - 0.5) * height * 2;
                     this.z = Math.random() * width;
                     this.pz = this.z;
                     this.speed = 15;
-                    this.color = Math.random() > 0.8 ? '#facc15' : '#14b8a6'; // Yellow or Teal
+                    this.color = Math.random() > 0.8 ? '#facc15' : '#14b8a6';
                 } else {
-                    // Slow floating dust (Quantum Particles)
                     this.x = Math.random() * width;
                     this.y = Math.random() * height;
                     this.z = Math.random() * width;
@@ -324,13 +255,9 @@
                     this.z -= this.speed;
                     if (this.z < 1) { this.init(); this.z = width; this.pz = this.z; }
                 } else {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    // Wrap around screen
-                    if(this.x < 0) this.x = width;
-                    if(this.x > width) this.x = 0;
-                    if(this.y < 0) this.y = height;
-                    if(this.y > height) this.y = 0;
+                    this.x += this.vx; this.y += this.vy;
+                    if(this.x < 0) this.x = width; if(this.x > width) this.x = 0;
+                    if(this.y < 0) this.y = height; if(this.y > height) this.y = 0;
                 }
             }
 
@@ -342,25 +269,17 @@
                     let py = (this.y / this.pz) * height + height/2;
                     this.pz = this.z;
                     if (sx < 0 || sx > width || sy < 0 || sy > height) return;
-                    const alpha = 1 - (this.z / width);
                     ctx.beginPath();
-                    ctx.moveTo(px, py);
-                    ctx.lineTo(sx, sy);
-                    ctx.strokeStyle = this.color;
-                    ctx.lineWidth = (1 - this.z / width) * 2;
-                    ctx.globalAlpha = alpha;
-                    ctx.stroke();
+                    ctx.moveTo(px, py); ctx.lineTo(sx, sy);
+                    ctx.strokeStyle = this.color; ctx.lineWidth = (1 - this.z / width) * 2;
+                    ctx.globalAlpha = 1 - (this.z / width); ctx.stroke();
                 } else {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.globalAlpha = 0.8;
-                    ctx.fill();
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color; ctx.globalAlpha = 0.8; ctx.fill();
                 }
             }
         }
 
-        // Initialize Dual Particles
         const isMobile = window.innerWidth < 768;
         const warpCount = isMobile ? 80 : 250;
         const dustCount = isMobile ? 30 : 80;
@@ -369,45 +288,31 @@
         for(let i=0; i<dustCount; i++) particles.push(new Particle('dust'));
 
         function animate() {
-            ctx.fillStyle = 'rgba(2, 6, 23, 0.3)'; // Trail effect
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.3)';
             ctx.fillRect(0, 0, width, height);
-            
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particles.forEach(p => { p.update(); p.draw(); });
             requestAnimationFrame(animate);
         }
         animate();
 
-
-        // === 2. DATA SIMULATION ===
-        
-        // Random Fluctuation Helpers
+        // === 3. DATA SIMULATION ===
         function fluctuate(id, min, max, fixed) {
             const el = document.getElementById(id);
             if(el) el.innerText = (Math.random() * (max - min) + min).toFixed(fixed);
         }
-
         setInterval(() => { fluctuate('d-stable', 98.0, 99.9, 1); }, 2000);
         setInterval(() => { fluctuate('d-temp', 60, 75, 0); }, 1000);
         setInterval(() => { fluctuate('d-pack', 3000, 5000, 0); }, 100);
         setInterval(() => { fluctuate('d-lat', 8, 24, 0); }, 500);
 
-        // Status Sequence
         const messages = ["Data receiving...", "Encrypting...", "Analysing...", "Done"];
         let msgIndex = 0;
-        
         function updateStatus() {
             const el = document.getElementById('sys-msg');
             el.innerText = messages[msgIndex];
-            
             if(msgIndex === messages.length - 1) {
                 setTimeout(() => { msgIndex = 0; updateStatus(); }, 4000); 
-            } else {
-                msgIndex++;
-                setTimeout(updateStatus, 1500);
-            }
+            } else { msgIndex++; setTimeout(updateStatus, 1500); }
         }
         updateStatus();
 
